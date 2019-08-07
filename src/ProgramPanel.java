@@ -19,7 +19,7 @@ public class ProgramPanel extends JPanel {
 
             }*/
 
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < 13; ++i) {
                 String vertix1 = reader.readLine(), vertix2 = reader.readLine();
                 OntologyNode node = ontology.findNode(vertix1);
                 OntologyNode newNode = new OntologyNode(vertix2);

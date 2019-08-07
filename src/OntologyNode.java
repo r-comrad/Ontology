@@ -49,7 +49,7 @@ public class OntologyNode {
         return result;
     }
 
-    public void draw(mxGraph aGraph, Object aParent, Object aStartVertex, double aX, double aY, double aK) {
+    public void draw(mxGraph aGraph, Object aParent, Object aStartVertex, double aX, double aY, Angle aAngle) {
         if (!isDrawed) {
             isDrawed = true;
             Object vertex = aGraph.insertVertex(aParent, null, mСonceptName,
@@ -58,21 +58,25 @@ public class OntologyNode {
             aGraph.insertEdge(aParent, null, "-", aStartVertex, vertex);
 
             double r = 50;
-            double angel = 180. / mConnections.size();
-            double x = Math.sqrt(r * r / (aK * aK + 1)) + aX;
-            double y = aK * x;
-
-            double radAngle = angel / 180 * 3.14;
-            double newX = (x - aX) * Math.cos(1.57) - (y - aY) * Math.sin(1.57)+ aX;
-            double newY = (x - aX) * Math.sin(1.57) + (y - aY) * Math.cos(1.57)+ aY;
+            Angle dAngle = new Angle(mConnections.size() == 1 ? 0 : 180. / (mConnections.size() - 1));
+            aAngle.add(-90);
+            double x = (0) * aAngle.getCos() - (- r) * aAngle.getSin() + aX;
+            double y = (0) * aAngle.getSin() + (- r) * aAngle.getCos() + aY;
 
             for (Map.Entry<String, OntologyNode> entry : mConnections.entrySet()) {
-                double newK = (newX - aX) / (newY - aY);
-                draw(aGraph, aParent, vertex, newX, newY, newK);
+                try {
+                    entry.getValue().draw(aGraph, aParent, vertex, x, y, aAngle.clone());
+                } catch (CloneNotSupportedException e) {
+                    System.out.println("Объект не может быть клонированным.");
+                }
+
+                //aAngle.add(dAngle);
+                double newX = (x - aX) * dAngle.getCos() - (y - aY) * dAngle.getSin() + aX;
+                double newY = (x - aX) * dAngle.getSin() + (y - aY) * dAngle.getCos() + aY;
+
+
                 x = newX;
                 y = newY;
-                newX = (x - aX) * Math.cos(radAngle) - (y - aY) * Math.sin(radAngle)+ aX;
-                newY = (x - aX) * Math.sin(radAngle) + (y - aY) * Math.cos(radAngle)+ aY;
             }
         }
     }
@@ -83,22 +87,28 @@ public class OntologyNode {
                 aX, aY, 40, 20);
 
         double r = 50;
-        double angel = 360 / mConnections.size();
+        double dAngle = 360 / mConnections.size();
         double x = aX;
         double y = aY - r;
-
-        double radAngle = angel / 180 * 3.14;
+        Angle angle = new Angle(0);
 
         for (Map.Entry<String, OntologyNode> entry : mConnections.entrySet()) {
-            double k = (x - aX) / (y - aY);
-            entry.getValue().draw(aGraph, aParent, vertex, x, y, k);
+            try {
+            entry.getValue().draw(aGraph, aParent, vertex, x, y, angle.clone());
+            } catch (CloneNotSupportedException e) {
+                System.out.println("Объект не может быть клонированным.");
+            }
+            //entry.getValue().draw(aGraph, aParent, vertex, x, y, angle);
 
-            double newX = (x - aX) * Math.cos(radAngle) - (y - aY) * Math.sin(radAngle) + aX;
-            double newY = (x - aX) * Math.sin(radAngle) + (y - aY) * Math.cos(radAngle) + aY;
+            angle.add(dAngle);
+            double newX = (x - aX) * angle.getCos() - (y - aY) * angle.getSin() + aX;
+            double newY = (x - aX) * angle.getSin() + (y - aY) * angle.getCos() + aY;
+
+
             x = newX;
             y = newY;
         }
-    }
+     }
 
     private String getCommandName() {
         return mСonceptName;
