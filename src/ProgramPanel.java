@@ -19,7 +19,7 @@ public class ProgramPanel extends JPanel {
 
             }*/
 
-            for (int i = 0; i < 5; ++i) {
+            for (int i = 0; i < 6; ++i) {
                 String vertix1 = reader.readLine(), vertix2 = reader.readLine();
                 OntologyNode node = ontology.findNode(vertix1);
                 OntologyNode newNode = new OntologyNode(vertix2);
@@ -32,7 +32,7 @@ public class ProgramPanel extends JPanel {
 
         mxGraph graph = new mxGraph();
         Object parent = graph.getDefaultParent();
-        ontology.draw(graph, parent, ontology);
+        ontology.drawCenter(graph, parent, ontology, 100, 100);
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         add(graphComponent);
     }
