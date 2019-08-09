@@ -1,42 +1,40 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class CommandTreeNode {
-    boolean isEnd = false;
-    String mParentName = "";
-    public Map<Character, CommandTreeNode> mChilds = new HashMap<Character, CommandTreeNode>();
+    boolean isEnd;
+    String mParentName;
+    public Map<Character, CommandTreeNode> mChilds;
 
-    public void add(char[] aCommand, String aParentName) {
-        add(aCommand, aParentName, 0);
+    public CommandTreeNode()
+    {
+        isEnd = false;
+        mParentName = "";
+        mChilds = new HashMap<Character, CommandTreeNode>();
     }
 
-    private void add(char[] aCommand, String aParentName, int aNumber) {
-        char letter = aCommand[aNumber];
-
-        if (!mChilds.containsKey(letter)) {
-            mChilds.put(letter, new CommandTreeNode());
-        }
-
-        if (aCommand.length == aNumber + 1) {
-            mChilds.get(letter).isEnd = true;
-            mChilds.get(letter).mParentName = aParentName;
+    public void add(String aCommand, String aParentName) {
+        if (Objects.equals(aCommand, "")) {
+            isEnd = true;
+            mParentName = aParentName;
         } else {
-            mChilds.get(letter).add(aCommand, aParentName, aNumber + 1);
+            char letter = aCommand.charAt(0);
+            if (!mChilds.containsKey(letter)) {
+                mChilds.put(letter, new CommandTreeNode());
+            }
+            mChilds.get(letter).add(aCommand.substring(1), aParentName);
         }
     }
 
-    public String getParent(char[] aCommand) {
-        return getParent(aCommand, 0);
-    }
-
-    private String getParent(char[] aCommand, int aNumber) {
-        char letter = aCommand[aNumber];
+    public String getParent(String aCommand) {
         String result = "";
-        if (mChilds.containsKey(letter)) {
-            if (aCommand.length == aNumber + 1) {
-                result = mChilds.get(letter).mParentName;
-            } else {
-                result = mChilds.get(letter).getParent(aCommand, aNumber + 1);
+        if (Objects.equals(aCommand, "")) {
+            result = mParentName;
+        } else {
+            char letter = aCommand.charAt(0);
+            if (mChilds.containsKey(letter)) {
+                result = mChilds.get(letter).getParent(aCommand.substring(1));
             }
         }
         return result;

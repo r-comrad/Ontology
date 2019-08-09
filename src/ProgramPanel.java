@@ -31,90 +31,47 @@ public class ProgramPanel extends JPanel {
     }
 
     public void codeParser() {
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream("D:/projects/Java/Ontology/res/" + "test file.txt"), StandardCharsets.UTF_8))) {
-            //int count = Integer.parseInt(fileReader(reader));
-            //for (int i = 0; i < count; ++i) {
-            String command;
-            while (!Objects.equals(command = fileReader(reader), "")) {
-                //String command = fileReader(reader);
-
-                if (command.endsWith(";")) command = command.substring(0, command.length() - 1);
-                String parent = mCommandTree.getParent(command.toCharArray());
-                if (parent != "") {
-                    OntologyNode node = mOntology.findNode(parent);
-                    OntologyNode newNode = new OntologyNode(command);
-                    node.addConnection(newNode);
-                }
+        MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "test file.txt");
+        String command;
+        while (!Objects.equals(command = fileReader.read(), "")) {
+            if (command.endsWith(";")) command = command.substring(0, command.length() - 1);
+            String parent = mCommandTree.getParent(command);
+            if (!Objects.equals(parent, "")) {
+                OntologyNode node = mOntology.findNode(parent);
+                OntologyNode newNode = new OntologyNode(command);
+                node.addConnection(newNode);
             }
-        } catch (IOException ex) {
-
-            System.out.println(ex.getMessage());
         }
     }
 
     public void ontologyReader() {
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream("D:/projects/Java/Ontology/res/" + "ontology.txt"), StandardCharsets.UTF_8))) {
-            int count = Integer.parseInt(fileReader(reader));
-            for (int i = 0; i < count; ++i) {
-                String parent = fileReader(reader);
-                String concept = fileReader(reader);
+        MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "ontology.txt");
+        int count = Integer.parseInt(fileReader.read());
+        for (int i = 0; i < count; ++i) {
+            String parent = fileReader.read();
+            String concept = fileReader.read();
 
-                OntologyNode node = mOntology.findNode(parent);
-                OntologyNode newNode = new OntologyNode(concept);
-                node.addConnection(newNode);
-            }
-        } catch (IOException ex) {
-
-            System.out.println(ex.getMessage());
+            OntologyNode node = mOntology.findNode(parent);
+            OntologyNode newNode = new OntologyNode(concept);
+            node.addConnection(newNode);
         }
     }
 
     public void commandTreeReader() {
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream("D:/projects/Java/Ontology/res/" + "commands list.txt"), StandardCharsets.UTF_8))) {
-            int count = Integer.parseInt(fileReader(reader));
-            for (int i = 0; i < count; ++i) {
+        MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "commands list.txt");
+        int count = Integer.parseInt(fileReader.read());
+        for (int i = 0; i < count; ++i) {
 
-                String command = fileReader(reader);
-                String parent = fileReader(reader);
+            String command = fileReader.read();
+            String parent = fileReader.read();
 
-                mCommandTree.add(command.toCharArray(), parent);
-            }
-        } catch (IOException ex) {
-
-            System.out.println(ex.getMessage());
+            mCommandTree.add(command, parent);
         }
     }
 
     public ProgramPanel() {
         mOntology = new OntologyNode("start");
         mCommandTree = new CommandTreeNode();
-
-        /*try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream("D:/projects/Java/Ontology/res/" + "onyology.txt"), StandardCharsets.UTF_8))) {*/
-            /*String command;
-            while ((command = reader.readLine()) != null) {
-                System.out.println(command);
-                tree.add(command.toCharArray(), 0);
-
-            }*/
-
-            /*for (int i = 0; i < 13; ++i) {
-                String vertix1 = reader.readLine(), vertix2 = reader.readLine();
-                OntologyNode node = ontology.findNode(vertix1);
-                OntologyNode newNode = new OntologyNode(vertix2);
-                node.addConnection(newNode);
-            }*/
-
-        /*} catch (IOException e) {
-            // log error
-        }*/
 
         ontologyReader();
         commandTreeReader();

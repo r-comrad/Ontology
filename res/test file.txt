@@ -1,0 +1,11 @@
+	boool bool kksk;
+	dfs'
+	{
+	yy main()
+	   int;
+float ll;
+	}
+	doudle
+	ff;
+	}
+	
