@@ -1,8 +1,4 @@
 import javax.swing.*;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -22,7 +18,8 @@ public class ProgramPanel extends JPanel {
 
         mxGraph graph = new mxGraph();
         Object parent = graph.getDefaultParent();
-        mOntology.drawCenter(graph, parent, mOntology, 100, 100);
+        //mOntology.drawCenter(graph, parent, mOntology, 100, 100);
+        mOntology.draw(graph, parent, null, new CircleManager(100, 100));
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         add(graphComponent);
     }

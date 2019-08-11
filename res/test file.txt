@@ -6,4 +6,6 @@ bool bool gg ftp;
 	floatfloat;
 	doub;
 	char
+	a b
+	foo
 	}

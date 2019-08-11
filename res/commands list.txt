@@ -1,6 +1,9 @@
-5
+8
 double standard
 float standard
 int standard
 char standard
 bool standard
+a int
+b int
+foo function
