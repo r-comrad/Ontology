@@ -1,6 +1,6 @@
 5
-int standart
-float standart
-double standart
-bool standart
-char standart
+double standard
+float standard
+int standard
+char standard
+bool standard

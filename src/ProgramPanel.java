@@ -12,22 +12,19 @@ public class ProgramPanel extends JPanel {
     private OntologyNode mOntology;
     private CommandTreeNode mCommandTree;
 
-    public String fileReader(BufferedReader aReader) {
-        String result = "";
-        while (Objects.equals(result, "")) {
-            try {
-                int c;
-                while (!Character.isWhitespace((char) (c = aReader.read()))) { // TODO: \f \r
-                    if (c == -1) return result;
-                    //for(Character obj : aBreakChars)
-                    result += (char) c;
-                }
-            } catch (IOException ex) {
+    public ProgramPanel() {
+        mOntology = new OntologyNode("start");
+        mCommandTree = new CommandTreeNode();
 
-                System.out.println(ex.getMessage());
-            }
-        }
-        return result;
+        ontologyReader();
+        commandTreeReader();
+        codeParser();
+
+        mxGraph graph = new mxGraph();
+        Object parent = graph.getDefaultParent();
+        mOntology.drawCenter(graph, parent, mOntology, 100, 100);
+        mxGraphComponent graphComponent = new mxGraphComponent(graph);
+        add(graphComponent);
     }
 
     public void codeParser() {
@@ -61,26 +58,9 @@ public class ProgramPanel extends JPanel {
         MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "commands list.txt");
         int count = Integer.parseInt(fileReader.read());
         for (int i = 0; i < count; ++i) {
-
             String command = fileReader.read();
             String parent = fileReader.read();
-
             mCommandTree.add(command, parent);
         }
-    }
-
-    public ProgramPanel() {
-        mOntology = new OntologyNode("start");
-        mCommandTree = new CommandTreeNode();
-
-        ontologyReader();
-        commandTreeReader();
-        codeParser();
-
-        mxGraph graph = new mxGraph();
-        Object parent = graph.getDefaultParent();
-        mOntology.drawCenter(graph, parent, mOntology, 100, 100);
-        mxGraphComponent graphComponent = new mxGraphComponent(graph);
-        add(graphComponent);
     }
 }

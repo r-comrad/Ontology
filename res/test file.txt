@@ -1,11 +1,9 @@
-	boool bool kksk;
-	dfs'
-	{
-	yy main()
-	   int;
-float ll;
+bool bool gg ftp; 
+	jj;
+	jj = ftp + jj + int;
+	return 0
+	main() {
+	floatfloat;
+	doub;
+	char
 	}
-	doudle
-	ff;
-	}
-	

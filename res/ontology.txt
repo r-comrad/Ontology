@@ -1,2 +1,17 @@
-1
-start standart
+2
+start standard
+start function
+
+start integer
+start double
+integer int
+int a
+int b
+integer uint_32
+double r1
+double r2
+double r3
+r2 rr21
+r2 rr22
+r2 rr23
+r2 rr24

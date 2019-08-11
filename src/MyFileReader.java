@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class MyFileReader {
-
     private BufferedReader mFile;
 
     public MyFileReader(String aFileName) {

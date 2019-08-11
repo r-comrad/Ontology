@@ -7,6 +7,11 @@ public class OntologyNode {
     private Map<String, OntologyNode> mConnections;
     boolean isDrawed = false;
 
+    public OntologyNode(String aСonceptName) {
+        mСonceptName = aСonceptName;
+        mConnections = new HashMap<String, OntologyNode>();
+    }
+
     public void addConnection(ArrayList<String> aPath, OntologyNode aNode) {
         OntologyNode node = getNode(aPath);
         node.mConnections.put(aNode.getCommandName(), aNode);
@@ -14,11 +19,6 @@ public class OntologyNode {
 
     public void addConnection(OntologyNode aNode) {
         mConnections.put(aNode.getCommandName(), aNode);
-    }
-
-    public OntologyNode(String aСonceptName) {
-        mСonceptName = aСonceptName;
-        mConnections = new HashMap<String, OntologyNode>();
     }
 
     public OntologyNode getNode(ArrayList<String> aPath) {
@@ -32,10 +32,10 @@ public class OntologyNode {
     }
 
     public OntologyNode findNode(String aСonceptName) {
+        OntologyNode result = null;
+
         Queue<OntologyNode> queue = new LinkedList<>();
         queue.offer(this);
-
-        OntologyNode result = null;
         while (!queue.isEmpty()) {
             OntologyNode node = queue.remove();
             if (Objects.equals(node.mСonceptName, aСonceptName)) {
@@ -46,6 +46,7 @@ public class OntologyNode {
                 queue.offer(entry.getValue());
             }
         }
+
         return result;
     }
 
