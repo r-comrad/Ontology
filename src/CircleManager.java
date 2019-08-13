@@ -40,6 +40,15 @@ public class CircleManager {
     public void recalculateAngleChange(int aConnectionCount) {
         mAngleChange = new Angle(aConnectionCount == 1 ? 0
                 : 180 / (aConnectionCount - 1));
+
+        if(aConnectionCount == 1)
+        {
+            double r = 50;
+            mMainAngle.add(90);
+            double x = (0) * mMainAngle.getCos() - (-r) * mMainAngle.getSin() + mCenter.getX();
+            double y = (0) * mMainAngle.getSin() + (-r) * mMainAngle.getCos() + mCenter.getY();
+            mCirclePoint = new Point(x, y);
+        }
     }
 
     public Point getCenter() {

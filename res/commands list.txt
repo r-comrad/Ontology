@@ -1,9 +1,12 @@
-8
-double standard
-float standard
-int standard
-char standard
-bool standard
+6
+double basic
+float basic
+int basic
+char basic
+bool basic
+void basic
+
+
 a int
 b int
 foo function

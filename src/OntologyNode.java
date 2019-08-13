@@ -31,14 +31,15 @@ public class OntologyNode {
         }
     }
 
-    public OntologyNode findNode(String aСonceptName) {
+    public OntologyNode findNode(String aConceptName) {
         OntologyNode result = null;
+        //aConceptName.
 
         Queue<OntologyNode> queue = new LinkedList<>();
         queue.offer(this);
         while (!queue.isEmpty()) {
             OntologyNode node = queue.remove();
-            if (Objects.equals(node.mСonceptName, aСonceptName)) {
+            if (Objects.equals(node.mСonceptName, aConceptName)) {
                 result = node;
                 break;
             }
