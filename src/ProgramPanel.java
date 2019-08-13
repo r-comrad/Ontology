@@ -19,7 +19,7 @@ public class ProgramPanel extends JPanel {
         mxGraph graph = new mxGraph();
         Object parent = graph.getDefaultParent();
         //mOntology.drawCenter(graph, parent, mOntology, 100, 100);
-        mOntology.draw(graph, parent, null, new CircleManager(300, 300));
+        mOntology.draw(graph, parent, null, new CircleManager(300, 300), "");
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         add(graphComponent);
     }
@@ -33,7 +33,7 @@ public class ProgramPanel extends JPanel {
             if (!Objects.equals(parent, "")) {
                 OntologyNode node = mOntology.findNode(parent);
                 OntologyNode newNode = new OntologyNode(command);
-                node.addConnection(newNode);
+                node.addConnection(newNode, "include");
             }
         }
     }
@@ -47,7 +47,7 @@ public class ProgramPanel extends JPanel {
 
             OntologyNode node = mOntology.findNode(parent);
             OntologyNode newNode = new OntologyNode(concept);
-            node.addConnection(newNode);
+            node.addConnection(newNode, "include");
         }
     }
 

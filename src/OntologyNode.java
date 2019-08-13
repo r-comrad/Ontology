@@ -3,25 +3,25 @@ import com.mxgraph.view.mxGraph;
 import java.util.*;
 
 public class OntologyNode {
-    private String mСonceptName;
-    private Map<String, OntologyNode> mConnections;
+    private String mConceptName;
+    private Map<String, Pair<String, OntologyNode>> mConnections;
     boolean isDrawed = false;
 
-    public OntologyNode(String aСonceptName) {
-        mСonceptName = aСonceptName;
-        mConnections = new HashMap<String, OntologyNode>();
+    public OntologyNode(String aConceptName) {
+        mConceptName = aConceptName;
+        mConnections = new HashMap<>();
     }
 
-    public void addConnection(ArrayList<String> aPath, OntologyNode aNode) {
+    /*public void addConnection(ArrayList<String> aPath, OntologyNode aNode) {
         OntologyNode node = getNode(aPath);
         node.mConnections.put(aNode.getCommandName(), aNode);
+    }*/
+
+    public void addConnection(OntologyNode aNode, String aConnectionName) {
+        mConnections.put(aNode.getCommandName(), new Pair(aConnectionName, aNode));
     }
 
-    public void addConnection(OntologyNode aNode) {
-        mConnections.put(aNode.getCommandName(), aNode);
-    }
-
-    public OntologyNode getNode(ArrayList<String> aPath) {
+    /*public OntologyNode getNode(ArrayList<String> aPath) {
         if (aPath.isEmpty()) {
             return this;
         } else {
@@ -29,7 +29,7 @@ public class OntologyNode {
             aPath.remove(0);
             return node.getNode(aPath);
         }
-    }
+    }*/
 
     public OntologyNode findNode(String aConceptName) {
         OntologyNode result = null;
@@ -39,38 +39,40 @@ public class OntologyNode {
         queue.offer(this);
         while (!queue.isEmpty()) {
             OntologyNode node = queue.remove();
-            if (Objects.equals(node.mСonceptName, aConceptName)) {
+            if (Objects.equals(node.mConceptName, aConceptName)) {
                 result = node;
                 break;
             }
-            for (Map.Entry<String, OntologyNode> entry : node.mConnections.entrySet()) {
-                queue.offer(entry.getValue());
+            for (Map.Entry<String, Pair<String, OntologyNode>> entry : node.mConnections.entrySet()) {
+                queue.offer(entry.getValue().getSecond());
             }
         }
 
         return result;
     }
 
-    public void draw(mxGraph aGraph, Object aParent, Object aStartVertex, CircleManager aCircle) {
+    public void draw(mxGraph aGraph, Object aParent, Object aStartVertex, CircleManager aCircle, String aConnectionName) {
         if (!isDrawed) {
             isDrawed = true;
 
-            Point center = aCircle.getCenter();
-            Object vertex = aGraph.insertVertex(aParent, null, mСonceptName,
+            Pair<Double, Double> center = aCircle.getCenter();
+            Object vertex = aGraph.insertVertex(aParent, null, mConceptName,
                     center.getX(), center.getY(), 40, 20);
             if (aStartVertex != null) {
-                aGraph.insertEdge(aParent, null, "-", aStartVertex, vertex);
+                aGraph.insertEdge(aParent, null, aConnectionName, aStartVertex, vertex);
             }
 
             aCircle.recalculateAngleChange(mConnections.size());
-            for (Map.Entry<String, OntologyNode> entry : mConnections.entrySet()) {
-                entry.getValue().draw(aGraph, aParent, vertex, new CircleManager(aCircle));
+            for (Map.Entry<String, Pair<String, OntologyNode>> entry : mConnections.entrySet()) {
+                String connectionName = entry.getValue().getFirst();
+                OntologyNode drawTarget = entry.getValue().getSecond();
+                drawTarget.draw(aGraph, aParent, vertex, new CircleManager(aCircle), connectionName);
                 aCircle.rotatePoint();
             }
         }
     }
 
     private String getCommandName() {
-        return mСonceptName;
+        return mConceptName;
     }
 }

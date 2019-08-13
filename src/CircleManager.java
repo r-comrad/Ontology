@@ -1,31 +1,33 @@
 public class CircleManager {
-    private Point mCenter;
-    private Point mCirclePoint;
+    double mR = 75;
+
+    private Pair<Double, Double>  mCenter;
+    private Pair<Double, Double>  mCirclePoint;
 
     private Angle mMainAngle;
     private Angle mAngleChange;
 
     public CircleManager(double aX, double aY) {
-        double r = 50;
+        //double r = 50;
 
-        mCenter = new Point(aX, aY);
+        mCenter = new Pair(aX, aY);
         mMainAngle = new Angle(0);
 
         double x = aX;
-        double y = aY - r;
-        mCirclePoint = new Point(x, y);
+        double y = aY - mR;
+        mCirclePoint = new Pair(x, y);
     }
 
     public CircleManager(CircleManager aOther) {
-        double r = 50;
+        //double r = 50;
 
         mMainAngle = new Angle(aOther.mMainAngle);
         mMainAngle.add(-90);
         mCenter = aOther.mCirclePoint;
 
-        double x = (0) * mMainAngle.getCos() - (-r) * mMainAngle.getSin() + mCenter.getX();
-        double y = (0) * mMainAngle.getSin() + (-r) * mMainAngle.getCos() + mCenter.getY();
-        mCirclePoint = new Point(x, y);
+        double x = (0) * mMainAngle.getCos() - (-mR) * mMainAngle.getSin() + mCenter.getX();
+        double y = (0) * mMainAngle.getSin() + (-mR) * mMainAngle.getCos() + mCenter.getY();
+        mCirclePoint = new Pair(x, y);
     }
 
     public void rotatePoint() {
@@ -43,15 +45,14 @@ public class CircleManager {
 
         if(aConnectionCount == 1)
         {
-            double r = 50;
             mMainAngle.add(90);
-            double x = (0) * mMainAngle.getCos() - (-r) * mMainAngle.getSin() + mCenter.getX();
-            double y = (0) * mMainAngle.getSin() + (-r) * mMainAngle.getCos() + mCenter.getY();
-            mCirclePoint = new Point(x, y);
+            double x = (0) * mMainAngle.getCos() - (-mR) * mMainAngle.getSin() + mCenter.getX();
+            double y = (0) * mMainAngle.getSin() + (-mR) * mMainAngle.getCos() + mCenter.getY();
+            mCirclePoint = new Pair(x, y);
         }
     }
 
-    public Point getCenter() {
+    public Pair getCenter() {
         return mCenter;
     }
 
