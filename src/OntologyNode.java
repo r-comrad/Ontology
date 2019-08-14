@@ -19,6 +19,7 @@ public class OntologyNode {
 
     public void addConnection(OntologyNode aNode, String aConnectionName) {
         mConnections.put(aNode.getCommandName(), new Pair(aConnectionName, aNode));
+        aNode.mConnections.put(getCommandName(), new Pair(aNode.getCommandName() + "-", this));
     }
 
     /*public OntologyNode getNode(ArrayList<String> aPath) {
@@ -37,13 +38,17 @@ public class OntologyNode {
 
         Queue<OntologyNode> queue = new LinkedList<>();
         queue.offer(this);
+        Set<String> painted = new HashSet<>();
+
         while (!queue.isEmpty()) {
             OntologyNode node = queue.remove();
+            painted.add(node.getCommandName());
             if (Objects.equals(node.mConceptName, aConceptName)) {
                 result = node;
                 break;
             }
             for (Map.Entry<String, Pair<String, OntologyNode>> entry : node.mConnections.entrySet()) {
+                if (painted.)
                 queue.offer(entry.getValue().getSecond());
             }
         }
@@ -59,7 +64,15 @@ public class OntologyNode {
             Object vertex = aGraph.insertVertex(aParent, null, mConceptName,
                     center.getX(), center.getY(), 40, 20);
             if (aStartVertex != null) {
-                aGraph.insertEdge(aParent, null, aConnectionName, aStartVertex, vertex);
+                //if (!Objects.equals(aConnectionName, "-")) {
+                if (!aConnectionName.endsWith("-")){
+                    aGraph.insertEdge(aParent, null, aConnectionName, aStartVertex, vertex);
+                }
+                else{
+                    String connectionName =
+                            mConnections.get(aConnectionName.substring(0, aConnectionName.length() - 1)).getFirst();
+                    aGraph.insertEdge(aParent, null, connectionName, vertex, aStartVertex);
+                }
             }
 
             aCircle.recalculateAngleChange(mConnections.size());

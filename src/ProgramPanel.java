@@ -44,10 +44,15 @@ public class ProgramPanel extends JPanel {
         for (int i = 0; i < count; ++i) {
             String parent = fileReader.read();
             String concept = fileReader.read();
+            String connection = fileReader.read();
 
-            OntologyNode node = mOntology.findNode(parent);
-            OntologyNode newNode = new OntologyNode(concept);
-            node.addConnection(newNode, "include");
+            OntologyNode nodeFrom = mOntology.findNode(parent);
+            OntologyNode nodeTo = mOntology.findNode(concept);
+
+            if (nodeFrom == null)nodeFrom = new OntologyNode(parent);
+            if (nodeTo == null)nodeTo = new OntologyNode(concept);
+
+            nodeFrom.addConnection(nodeTo, connection);
         }
     }
 
