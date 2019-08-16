@@ -19,7 +19,7 @@ public class ProgramPanel extends JPanel {
         mxGraph graph = new mxGraph();
         Object parent = graph.getDefaultParent();
         //mOntology.drawCenter(graph, parent, mOntology, 100, 100);
-        mOntology.draw(graph, parent, null, new CircleManager(300, 300), "");
+        mOntology.draw(graph, parent, 300, 300);
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         add(graphComponent);
     }
