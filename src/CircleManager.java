@@ -43,13 +43,13 @@ public class CircleManager {
         mAngleChange = new Angle(aConnectionCount == 1 ? 0
                 : 180 / (aConnectionCount - 1));
 
-        if(aConnectionCount == 1)
+        /*if(aConnectionCount == 1)
         {
             mMainAngle.add(90);
             double x = (0) * mMainAngle.getCos() - (-mR) * mMainAngle.getSin() + mCenter.getX();
             double y = (0) * mMainAngle.getSin() + (-mR) * mMainAngle.getCos() + mCenter.getY();
             mCirclePoint = new Pair(x, y);
-        }
+        }*/
     }
 
     public Pair getCenter() {

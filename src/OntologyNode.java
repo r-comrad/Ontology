@@ -19,7 +19,7 @@ public class OntologyNode {
 
     public void addConnection(OntologyNode aNode, String aConnectionName) {
         mConnections.put(aNode.getCommandName(), new Pair(aConnectionName, aNode));
-        aNode.mConnections.put(getCommandName(), new Pair(aNode.getCommandName() + "-", this));
+        aNode.mConnections.put(getCommandName(), new Pair("-" + aConnectionName, this));
     }
 
     /*public OntologyNode getNode(ArrayList<String> aPath) {
@@ -48,15 +48,20 @@ public class OntologyNode {
                 break;
             }
             for (Map.Entry<String, Pair<String, OntologyNode>> entry : node.mConnections.entrySet()) {
-                if (painted.)
-                queue.offer(entry.getValue().getSecond());
+                OntologyNode nextNode = entry.getValue().getSecond();
+                if (!painted.contains(nextNode.getCommandName()))
+                {
+                    queue.offer(nextNode);
+                    //painted.add(nextNode.getCommandName());
+                }
+
             }
         }
 
         return result;
     }
 
-    public void draw(mxGraph aGraph, Object aParent, Object aStartVertex, CircleManager aCircle, String aConnectionName) {
+    public boolean draw(mxGraph aGraph, Object aParent, Object aStartVertex, CircleManager aCircle, String aConnectionName) {
         if (!isDrawed) {
             isDrawed = true;
 
@@ -65,13 +70,12 @@ public class OntologyNode {
                     center.getX(), center.getY(), 40, 20);
             if (aStartVertex != null) {
                 //if (!Objects.equals(aConnectionName, "-")) {
-                if (!aConnectionName.endsWith("-")){
+                //if (!aConnectionName.endsWith("-")){
+                if (!aConnectionName.startsWith("-")){
                     aGraph.insertEdge(aParent, null, aConnectionName, aStartVertex, vertex);
                 }
                 else{
-                    String connectionName =
-                            mConnections.get(aConnectionName.substring(0, aConnectionName.length() - 1)).getFirst();
-                    aGraph.insertEdge(aParent, null, connectionName, vertex, aStartVertex);
+                    aGraph.insertEdge(aParent, null, aConnectionName.substring(1), vertex, aStartVertex);
                 }
             }
 
@@ -79,9 +83,17 @@ public class OntologyNode {
             for (Map.Entry<String, Pair<String, OntologyNode>> entry : mConnections.entrySet()) {
                 String connectionName = entry.getValue().getFirst();
                 OntologyNode drawTarget = entry.getValue().getSecond();
-                drawTarget.draw(aGraph, aParent, vertex, new CircleManager(aCircle), connectionName);
-                aCircle.rotatePoint();
+                if (drawTarget.draw(aGraph, aParent, vertex, new CircleManager(aCircle), connectionName))
+                {
+                    aCircle.rotatePoint();
+                }
             }
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
