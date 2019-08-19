@@ -7,8 +7,7 @@ public class CommandTreeNode {
     String mParentName;
     public Map<Character, CommandTreeNode> mChilds;
 
-    public CommandTreeNode()
-    {
+    public CommandTreeNode() {
         isEnd = false;
         mParentName = "";
         mChilds = new HashMap<Character, CommandTreeNode>();

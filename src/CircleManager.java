@@ -1,8 +1,8 @@
 public class CircleManager {
     double mR = 75;
 
-    private Pair<Double, Double>  mCenter;
-    private Pair<Double, Double>  mCirclePoint;
+    private Pair<Double, Double> mCenter;
+    private Pair<Double, Double> mCirclePoint;
 
     private Angle mMainAngle;
     private Angle mAngleChange;

@@ -5,8 +5,7 @@ public class CodeReader {
     private MyFileReader mReader;
     OntologyNode mOntology;
 
-    public CodeReader(OntologyNode aOntology, String aFileName)
-    {
+    public CodeReader(OntologyNode aOntology, String aFileName) {
         mOntology = aOntology;
         mReader = new MyFileReader(aFileName);
         process();
@@ -17,17 +16,16 @@ public class CodeReader {
         mReader = new MyFileReader(aFileName);
     }*/
 
-    public void process()
-    {
+    public void process() {
         String str;
-        while(!Objects.equals(str = mReader.read(), ""))
-        {
-            if (Objects.equals(str, "FUNK")) {funkParser();}
+        while (!Objects.equals(str = mReader.read(), "")) {
+            if (Objects.equals(str, "FUNK")) {
+                funkParser();
+            }
         }
     }
 
-    public void funkParser()
-    {
+    public void funkParser() {
         OntologyNode parentNode = mOntology.findNode("function");
         String funkName = mReader.read();
         OntologyNode funkNode = new OntologyNode(funkName);
@@ -38,8 +36,7 @@ public class CodeReader {
         funkNode.addConnection(returnTypeNode, "return");
 
         int argsCount = Integer.parseInt(mReader.read());
-        for(int i = 0; i < argsCount; ++i)
-        {
+        for (int i = 0; i < argsCount; ++i) {
             String argType = mReader.read();
             OntologyNode argTypeNode = mOntology.findNode(argType);
             funkNode.addConnection(argTypeNode, "take");

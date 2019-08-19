@@ -51,8 +51,8 @@ public class ProgramPanel extends JPanel {
             OntologyNode nodeFrom = mOntology.findNode(parent);
             OntologyNode nodeTo = mOntology.findNode(concept);
 
-            if (nodeFrom == null)nodeFrom = new OntologyNode(parent);
-            if (nodeTo == null)nodeTo = new OntologyNode(concept);
+            if (nodeFrom == null) nodeFrom = new OntologyNode(parent);
+            if (nodeTo == null) nodeTo = new OntologyNode(concept);
 
             nodeFrom.addConnection(nodeTo, connection);
         }
