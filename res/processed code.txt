@@ -1,0 +1,2 @@
+FUNK main int 0
+FUNK foo double 2 float int

@@ -25,7 +25,7 @@ public class ProgramPanel extends JPanel {
     }
 
     public void codeParser() {
-        MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "test file2.txt");
+        /*MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "test file2.txt");
         String command;
         while (!Objects.equals(command = fileReader.read(), "")) {
             if (command.endsWith(";")) command = command.substring(0, command.length() - 1);
@@ -35,7 +35,9 @@ public class ProgramPanel extends JPanel {
                 OntologyNode newNode = new OntologyNode(command);
                 node.addConnection(newNode, "include");
             }
-        }
+        }*/
+
+        CodeReader code = new CodeReader(mOntology, "D:/projects/Java/Ontology/res/" + "processed code.txt");
     }
 
     public void ontologyReader() {

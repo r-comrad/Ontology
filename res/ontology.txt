@@ -1,7 +1,13 @@
-3
-start types
-types basic
-start function
+9
+start types implement
+basic types AKO
+start function implement
+double basic AKO
+float basic AKO
+int basic AKO
+char basic AKO
+bool basic AKO
+void basic AKO
 
 
 start integer
