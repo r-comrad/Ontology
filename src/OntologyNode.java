@@ -61,6 +61,7 @@ public class OntologyNode {
 
     public void draw(mxGraph aGraph, Object aParent, double aX, double aY) {
         Set<String> painted = new HashSet<>();
+        Map<String, Object> drawedVertex = new HashMap<>();
         //draw(aGraph, aParent, null, new CircleManager(aX, aY), "", painted);
 
         Queue<OntologyNode> nodeQueue = new LinkedList<>();
@@ -80,8 +81,16 @@ public class OntologyNode {
 
             painted.add(node.getCommandName());
             Pair<Double, Double> center = circle.getCenter();
-            Object vertex = aGraph.insertVertex(aParent, null, node.mConceptName,
-                    center.getX(), center.getY(), 40, 20);
+
+            Object vertex;
+            if (drawedVertex.containsKey(node.mConceptName)) {
+                vertex = drawedVertex.get(node.mConceptName);
+            } else {
+                vertex = aGraph.insertVertex(aParent, null, node.mConceptName,
+                        center.getX(), center.getY(), 40, 20);
+                drawedVertex.put(node.mConceptName, vertex);
+            }
+
             if (previousVertex != null) {
                 if (!connectionName.startsWith("-")) {
                     aGraph.insertEdge(aParent, null, connectionName, previousVertex, vertex);
@@ -106,7 +115,8 @@ public class OntologyNode {
                     //drawTarget.draw(aGraph, aParent, vertex, new CircleManager(aCircle), connectionName, aPainted);
                     nodeQueue.offer(drawTarget);
                     vertexQueue.offer(vertex);
-                    circleQueue.offer(new CircleManager(circle));
+                    CircleManager cr = new CircleManager(circle);
+                    circleQueue.offer(cr);
                     connectionNameQueue.offer(nextConnectionName);
 
                     circle.rotatePoint();
@@ -114,7 +124,6 @@ public class OntologyNode {
             }
         }
     }
-
 
     private void draw(mxGraph aGraph, Object aParent, Object aStartVertex, CircleManager aCircle,
                       String aConnectionName, Set<String> aPainted) {

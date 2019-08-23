@@ -23,7 +23,7 @@ public class CircleManager {
 
         mMainAngle = new Angle(aOther.mMainAngle);
         mMainAngle.add(-90);
-        mCenter = aOther.mCirclePoint;
+        mCenter = new Pair(aOther.mCirclePoint);
 
         double x = (0) * mMainAngle.getCos() - (-mR) * mMainAngle.getSin() + mCenter.getX();
         double y = (0) * mMainAngle.getSin() + (-mR) * mMainAngle.getCos() + mCenter.getY();
