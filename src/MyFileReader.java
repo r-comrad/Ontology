@@ -8,10 +8,20 @@ import java.util.Objects;
 public class MyFileReader {
     private BufferedReader mFile;
 
+    public MyFileReader(String aFilePath, String aFileName) {
+        try {
+            mFile = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(aFilePath + aFileName), StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+
     public MyFileReader(String aFileName) {
         try {
             mFile = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(aFileName), StandardCharsets.UTF_8));
+                    new FileInputStream("D:/projects/Java/Ontology/res/" + aFileName), StandardCharsets.UTF_8));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }

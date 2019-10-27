@@ -9,6 +9,9 @@ public class ProgramPanel extends JPanel {
     private CommandTreeNode mCommandTree;
 
     public ProgramPanel() {
+        ProgramDecoder programDecoder = new ProgramDecoder();
+        programDecoder.process();
+
         mOntology = new OntologyNode("start");
         mCommandTree = new CommandTreeNode();
 
@@ -25,7 +28,7 @@ public class ProgramPanel extends JPanel {
     }
 
     public void codeParser() {
-        /*MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "test file2.txt");
+        /*MyFileReader fileReader = new MyFileReader("test file2.txt");
         String command;
         while (!Objects.equals(command = fileReader.read(), "")) {
             if (command.endsWith(";")) command = command.substring(0, command.length() - 1);
@@ -37,11 +40,11 @@ public class ProgramPanel extends JPanel {
             }
         }*/
 
-        CodeReader code = new CodeReader(mOntology, "D:/projects/Java/Ontology/res/" + "processed code.txt");
+        CodeReader code = new CodeReader(mOntology, "processed code.txt");
     }
 
     public void ontologyReader() {
-        MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "ontology.txt");
+        MyFileReader fileReader = new MyFileReader("ontology.txt");
         int count = Integer.parseInt(fileReader.read());
         for (int i = 0; i < count; ++i) {
             String parent = fileReader.read();
@@ -59,7 +62,7 @@ public class ProgramPanel extends JPanel {
     }
 
     public void commandTreeReader() {
-        MyFileReader fileReader = new MyFileReader("D:/projects/Java/Ontology/res/" + "commands list.txt");
+        MyFileReader fileReader = new MyFileReader("commands list.txt");
         int count = Integer.parseInt(fileReader.read());
         for (int i = 0; i < count; ++i) {
             String command = fileReader.read();

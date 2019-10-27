@@ -4,11 +4,22 @@ import java.nio.charset.StandardCharsets;
 public class MyFileWriter {
     private BufferedWriter mFile;
 
+    public MyFileWriter(String aFilePath, String aFileName) {
+
+        try {
+            mFile = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(aFilePath + aFileName), StandardCharsets.UTF_8));
+
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
     public MyFileWriter(String aFileName) {
 
         try {
             mFile = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(aFileName), StandardCharsets.UTF_8));
+                    new FileOutputStream("D:/projects/Java/Ontology/res/" + aFileName), StandardCharsets.UTF_8));
 
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
