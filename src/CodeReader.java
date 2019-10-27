@@ -8,25 +8,34 @@ public class CodeReader {
     public CodeReader(OntologyNode aOntology, String aFileName) {
         mOntology = aOntology;
         mReader = new MyFileReader(aFileName);
+
         process();
     }
 
-    /*public void setFile(String aFileName)
-    {
-        mReader = new MyFileReader(aFileName);
-    }*/
+    public CodeReader(OntologyNode aOntology) {
+        mOntology = aOntology;
+        mReader = new MyFileReader("rdf code");
+
+        process();
+    }
 
     public void process() {
-        String str;
-        while (!Objects.equals(str = mReader.read(), "")) {
-            if (Objects.equals(str, "FUNK")) {
-                funkParser();
-            }
+        String obj, subj, pred;
+        while (!Objects.equals(obj = mReader.read(), "") &&
+                !Objects.equals(subj = mReader.read(), "")&&
+                !Objects.equals(pred = mReader.read(), "")) {
+            OntologyNode nodeFrom = mOntology.findNode(obj);
+            OntologyNode nodeTo = mOntology.findNode(subj);
+
+            if (nodeFrom == null) nodeFrom = new OntologyNode(obj);
+            if (nodeTo == null) nodeTo = new OntologyNode(subj);
+
+            nodeFrom.addConnection(nodeTo, pred);
         }
     }
 
     public void funkParser() {
-        OntologyNode parentNode = mOntology.findNode("function");
+       /* OntologyNode parentNode = mOntology.findNode("function");
         String funkName = mReader.read();
         OntologyNode funkNode = new OntologyNode(funkName);
         parentNode.addConnection(funkNode, "AKA");
@@ -40,6 +49,6 @@ public class CodeReader {
             String argType = mReader.read();
             OntologyNode argTypeNode = mOntology.findNode(argType);
             funkNode.addConnection(argTypeNode, "take");
-        }
+        }*/
     }
 }

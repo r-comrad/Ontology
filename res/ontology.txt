@@ -1,3 +1,10 @@
+4
+start types implement
+basic types AKO
+start function implement
+int basic AKO
+
+
 9
 start types implement
 basic types AKO

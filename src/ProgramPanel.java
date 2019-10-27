@@ -40,7 +40,7 @@ public class ProgramPanel extends JPanel {
             }
         }*/
 
-        CodeReader code = new CodeReader(mOntology, "processed code.txt");
+        CodeReader code = new CodeReader(mOntology, "rdf code");
     }
 
     public void ontologyReader() {
