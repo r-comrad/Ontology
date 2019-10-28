@@ -1,0 +1,7 @@
+6
+void basic AKO
+int basic AKO
+float basic AKO
+double basic AKO
+bool basic AKO
+char basic AKO

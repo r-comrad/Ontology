@@ -15,7 +15,7 @@ public class ProgramPanel extends JPanel {
         mOntology = new OntologyNode("start");
         mCommandTree = new CommandTreeNode();
 
-        ontologyReader();
+        //ontologyReader();
         commandTreeReader();
         codeParser();
 

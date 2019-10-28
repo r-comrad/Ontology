@@ -1,7 +1,6 @@
-int main ( int ggg )
+int main ( double ggg )
 {
-	int a , b , c ;
-	int g ;
-	f = 89 ;
-	hh = b + c + a + 99 ;
+	int a , b ;
+	ggg = 89 ;
+	a = a + b + sqrt ( a ) + 99 ;
 }

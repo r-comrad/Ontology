@@ -4,34 +4,128 @@ public class ProgramDecoder {
     private MyFileReader mFileReader;
     private MyFileWriter mFileWriter;
 
+    private int mAssignmentCounter;
+
+    private HashSet<String> mUsedFunctions;
+    private HashSet<String> mUsedTypes;
+
+    ArrayList<Pair<String, String>> codeLevel;
+
     public ProgramDecoder() {
         mFileReader = new MyFileReader("code.cpp");
         mFileWriter = new MyFileWriter("rdf code");
+
+        mAssignmentCounter = 0;
+
+        mUsedFunctions = new HashSet<>();
+        mUsedTypes = new HashSet<>();
+
+        codeLevel = new ArrayList <>();
+        codeLevel.add(new Pair("start", "include"));
+    }
+
+    private void startPack()
+    {
+        mFileWriter.write(pack("start", "function", "implement"));
+        mFileWriter.write(pack("start", "types", "implement"));
+        mFileWriter.write(pack("basic", "types", "AKO"));
+    }
+
+    private void writeLever(String str)
+    {
+        mFileWriter.write(pack(str, codeLevel.get(codeLevel.size() - 1).mX,
+                codeLevel.get(codeLevel.size() - 1).mY));
+    }
+
+    private void variablePack()
+    {
+        mFileWriter.write(pack("start", "variable", "implement"));
     }
 
     public void process() {
-        List list = new ArrayList();
+        List <String> list = new ArrayList();
         int type = 0;
+        boolean variablelsUsed = false;
+
+        startPack();
 
         String str;
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
+
+
                 //stackParser(list);
-                if (type == 3 && list.size() > 0) funktionDecoder(list);
-                else if ((type & 1) != 0) variableDeclarationDecoder(list);
+                if (type == 3 && list.size() > 0) functionDecoder(list);
+                else if ((type & 1) != 0)
+                {
+                    variablelsUsed = true;
+                    variableDeclarationDecoder(list);
+                }
+
+                if ((type & 4) != 0) variableAssignmentDecoder(list);
                 //if ((type & 4) != 0) variableDeclarationDecoder(list);
+
+                if (isLevelIncreaser(str))
+                {
+                    codeLevel.add(new Pair(list.get(1), "include"));
+                }
+
+                if (isLevelDecreaser(str))
+                {
+                    codeLevel.remove(codeLevel.size() - 1);
+                }
+
                 list.clear();
                 type = 0;
             } else {
-                if (isTypeSequence(str) && list.size() == 0) type |= 1;
-                if (isFunctionalSequence(str)) type |= 2;
-                if (isAssignmentSequence(str)) type |= 4;
+                if (isTypeSequence(str) && list.size() == 0)
+                {
+                    mUsedTypes.add(str);
+                    type |= 1;
+                }
+                if (isFunctionalSequence(str))
+                {
+                    mUsedFunctions.add(list.get(list.size() - 1));
+                    type |= 2;
+                }
+                if (isAssignmentSequence(str))
+                {
+                    variablelsUsed = true;
+                    type |= 4;
+                }
 
                 if (!isUnusedSequence(str)) list.add(str);
             }
         }
 
+        if (mUsedTypes.size() > 0) typesDecoder();
+        if (variablelsUsed) variablePack();
+
         mFileWriter.close();
+    }
+
+    private void typesDecoder()
+    {
+        MyFileReader fileReader = new MyFileReader("basic_types.txt");
+        int count = Integer.parseInt(fileReader.read());
+        for (int i = 0; i < count; ++i) {
+            String parent = fileReader.read();
+            String concept = fileReader.read();
+            String connection = fileReader.read();
+            if (mUsedTypes.contains(parent))   mFileWriter.write(pack(parent, concept, connection));
+        }
+    }
+
+    public boolean isLevelIncreaser(String str) {
+        return Objects.equals(str, "{");
+    }
+
+    public boolean isLevelDecreaser(String str) {
+        return Objects.equals(str, "}");
+    }
+
+    public boolean isLevelIncrecer(String str) {
+        return Objects.equals(str, ";") || Objects.equals(str, "{") || Objects.equals(str, "}");
     }
 
     public boolean isEndSequence(String str) {
@@ -52,7 +146,8 @@ public class ProgramDecoder {
     }
 
     public boolean isUnusedSequence(String s) {
-        return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")");
+        return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")") ||
+                Objects.equals(s, "=") || Objects.equals(s, "+");
     }
 
     public void stackParser(List<String> aList) {
@@ -66,11 +161,14 @@ public class ProgramDecoder {
         return s1 + " " + s2 + " " + s3 + "\n";
     }
 
-    public void funktionDecoder(List<String> aList) {
+    public void functionDecoder(List<String> aList) {
+        writeLever( aList.get(1));
+
         mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
         mFileWriter.write(pack(aList.get(1), "function", "AKO"));
         for(int i = 2; i < aList.size(); i += 2)
         {
+            mUsedTypes.add(aList.get(i));
             mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
             mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
             mFileWriter.write(pack(aList.get(i + 1), "variable", "AKO"));
@@ -80,8 +178,29 @@ public class ProgramDecoder {
     public void variableDeclarationDecoder(List<String> aList) {
         for(int i = 1; i < aList.size(); ++i)
         {
+            writeLever( aList.get(i));
             mFileWriter.write(pack(aList.get(i), aList.get(0), "has_type"));
             mFileWriter.write(pack(aList.get(i), "variable", "AKO"));
+        }
+    }
+
+    public void variableAssignmentDecoder(List<String> aList) {
+        writeLever( aList.get(0));
+        String valueName = "value" + mAssignmentCounter++;
+        mFileWriter.write(pack(aList.get(0), valueName, "assignment"));
+        boolean usesNumeric = false;
+
+        for(int i = 1; i < aList.size(); ++i)
+        {
+            if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
+                    aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
+            mFileWriter.write(pack(valueName, aList.get(i), "use"));
+            else usesNumeric = true;
+        }
+
+        if (usesNumeric)
+        {
+            mFileWriter.write(pack(valueName, "numeric", "use"));
         }
     }
 }
