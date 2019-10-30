@@ -1,0 +1,4 @@
+match_functions function AKO
+sqrt match_functions AKO
+alghorithm_functions function AKO
+sort alghorithm_functions AKO

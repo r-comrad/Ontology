@@ -1,4 +1,11 @@
-match_functions function AKO
-sqrt match_functions AKO
-alghorithm_functions function AKO
-sort alghorithm_functions AKO
+3
+match
+1
+sqrt
+alghorithm
+1
+sort
+vector
+2
+size
+back

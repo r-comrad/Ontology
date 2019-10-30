@@ -54,8 +54,6 @@ public class ProgramDecoder {
         String str;
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
-
-
                 //stackParser(list);
                 if (type == 3 && list.size() > 0) functionDecoder(list);
                 else if ((type & 1) != 0) {
@@ -65,6 +63,8 @@ public class ProgramDecoder {
 
                 if ((type & 4) != 0) variableAssignmentDecoder(list);
                 //if ((type & 4) != 0) variableDeclarationDecoder(list);
+
+                if ((type & 8) != 0) streamDecoder(list);
 
                 if (isLevelIncreaser(str)) {
                     codeLevel.add(new Pair(list.get(1), "include"));
@@ -88,6 +88,9 @@ public class ProgramDecoder {
                 if (isAssignmentSequence(str)) {
                     variablelsUsed = true;
                     type |= 4;
+                }
+                if (isStreamOutput(str)) {
+                    type |= 8;
                 }
 
                 if (!isUnusedSequence(str)) list.add(str);
@@ -115,20 +118,26 @@ public class ProgramDecoder {
         }
     }
 
-
     private void stdFunctionPack() {
-        MyFileReader fileReader = new MyFileReader("basic_types.txt");
+        mFileWriter.write(pack("std_functions", "function", "AKO"));
+        MyFileReader fileReader = new MyFileReader("std_functions.txt");
         int groupsCount= Integer.parseInt(fileReader.read());
+
         for (int i = 0; i < groupsCount; ++i) {
             String parent = fileReader.read();
             int groupsSize= Integer.parseInt(fileReader.read());
+            boolean isFirstWrite = true;
             for(int j = 0; j < groupsSize; ++j)
             {
                 String funkName = fileReader.read();
                 if (mUsedFunctions.contains(funkName))
                 {
-                    mFileWriter.write(pack(groupsSize + "function", "std_functions", "AKO"));
-                    mFileWriter.write(pack(funkName, groupsSize + "function", "AKO"));
+                    if (isFirstWrite)
+                    {
+                        isFirstWrite = false;
+                        mFileWriter.write(pack(parent + "_functions", "std_functions", "AKO"));
+                    }
+                    mFileWriter.write(pack(funkName, parent + "_functions", "ISA"));
                 }
             }
         }
@@ -136,6 +145,10 @@ public class ProgramDecoder {
 
     public boolean isLevelIncreaser(String str) {
         return Objects.equals(str, "{");
+    }
+
+    public boolean isStreamOutput(String str) {
+        return Objects.equals(str, "cin") || Objects.equals(str, "cout");
     }
 
     public boolean isLevelDecreaser(String str) {
@@ -161,7 +174,8 @@ public class ProgramDecoder {
 
     public boolean isUnusedSequence(String s) {
         return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")") ||
-                Objects.equals(s, "=") || Objects.equals(s, "+");
+                Objects.equals(s, "=") || Objects.equals(s, "+") || Objects.equals(s, ">") ||
+                Objects.equals(s, "<");
     }
 
     public void stackParser(List<String> aList) {
@@ -179,12 +193,25 @@ public class ProgramDecoder {
         writeLever(aList.get(1));
 
         mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
-        mFileWriter.write(pack(aList.get(1), "user_functions", "AKO"));
+        mFileWriter.write(pack(aList.get(1), "user_functions", "ISA"));
         for (int i = 2; i < aList.size(); i += 2) {
             mUsedTypes.add(aList.get(i));
             mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
             mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
-            mFileWriter.write(pack(aList.get(i + 1), "variable", "AKO"));
+            mFileWriter.write(pack(aList.get(i + 1), "variable", "ISA"));
+        }
+    }
+
+    public void streamDecoder(List<String> aList) {
+        writeLever(aList.get(1));
+        
+        mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
+        mFileWriter.write(pack(aList.get(1), "user_functions", "ISA"));
+        for (int i = 2; i < aList.size(); i += 2) {
+            mUsedTypes.add(aList.get(i));
+            mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
+            mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
+            mFileWriter.write(pack(aList.get(i + 1), "variable", "ISA"));
         }
     }
 
@@ -192,7 +219,7 @@ public class ProgramDecoder {
         for (int i = 1; i < aList.size(); ++i) {
             writeLever(aList.get(i));
             mFileWriter.write(pack(aList.get(i), aList.get(0), "has_type"));
-            mFileWriter.write(pack(aList.get(i), "variable", "AKO"));
+            mFileWriter.write(pack(aList.get(i), "variable", "ISA"));
         }
     }
 
