@@ -5,6 +5,7 @@ public class ProgramDecoder {
     private MyFileWriter mFileWriter;
 
     private int mAssignmentCounter;
+    private int mConditionCounter;
 
     private HashSet<String> mUsedFunctions;
     private HashSet<String> mUsedTypes;
@@ -12,10 +13,11 @@ public class ProgramDecoder {
     ArrayList<Pair<String, String>> codeLevel;
 
     public ProgramDecoder() {
-        mFileReader = new MyFileReader("code.cpp");
+        mFileReader = new MyFileReader("sqr_equ_code.cpp");
         mFileWriter = new MyFileWriter("rdf code");
 
         mAssignmentCounter = 0;
+        mConditionCounter = 0;
 
         mUsedFunctions = new HashSet<>();
         mUsedTypes = new HashSet<>();
@@ -42,6 +44,15 @@ public class ProgramDecoder {
 
     private void inputStreamPack() {
         mFileWriter.write(pack("start", "input_stream", "implement"));
+        mFileWriter.write(pack("cin", "input_stream", "ISA"));
+        mFileWriter.write(pack("cout", "input_stream", "ISA"));
+    }
+
+    private void conditionPack() {
+        mFileWriter.write(pack("start", "condition", "implement"));
+        mFileWriter.write(pack("if", "condition", "ISA"));
+        mFileWriter.write(pack("if-else", "condition", "ISA"));
+        mFileWriter.write(pack("if-else_tree", "condition", "ISA"));
     }
 
     private void userFunctionsPack() {
@@ -52,7 +63,7 @@ public class ProgramDecoder {
         List<String> list = new ArrayList();
         int type = 0;
         boolean variablelsUsed = false;
-        boolean inputStreamUsed = false;
+        boolean streamUsed = false;
 
         startPack();
 
@@ -94,9 +105,9 @@ public class ProgramDecoder {
                     variablelsUsed = true;
                     type |= 4;
                 }
-                if (isStreamOutput(str)) {
+                if (isStreamSequence(str)) {
                     type |= 8;
-                    inputStreamUsed = true;
+                    streamUsed = true;
                 }
 
                 if (!isUnusedSequence(str)) list.add(str);
@@ -105,7 +116,7 @@ public class ProgramDecoder {
 
         if (mUsedTypes.size() > 0) typesDecoder();
         if (variablelsUsed) variablePack();
-        if (inputStreamUsed) inputStreamPack();
+        if (streamUsed) inputStreamPack();
         if (mUsedFunctions.size() > 0)
         {
             stdFunctionPack();
@@ -154,7 +165,7 @@ public class ProgramDecoder {
         return Objects.equals(str, "{");
     }
 
-    public boolean isStreamOutput(String str) {
+    public boolean isStreamSequence(String str) {
         return Objects.equals(str, "cin") || Objects.equals(str, "cout");
     }
 
@@ -179,10 +190,23 @@ public class ProgramDecoder {
         return Objects.equals(s, "(");
     }
 
+    public boolean isIfSequence(String s) {
+        return Objects.equals(s, "if");
+    }
+
+    public boolean isElseSequence(String s) {
+        return Objects.equals(s, "else");
+    }
+
+    public boolean isElseIfSequence(String s1, String s2) {
+        return Objects.equals(s1, "else") && Objects.equals(s2, "if");
+    }
+
     public boolean isUnusedSequence(String s) {
         return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")") ||
                 Objects.equals(s, "=") || Objects.equals(s, "+") || Objects.equals(s, ">") ||
-                Objects.equals(s, "<");
+                Objects.equals(s, "<") || Objects.equals(s, "&&") || Objects.equals(s, "||") ||
+                Objects.equals(s, "!=") || Objects.equals(s, "==");
     }
 
     public void stackParser(List<String> aList) {
@@ -209,14 +233,32 @@ public class ProgramDecoder {
         }
     }
 
+    public void conditionDecoder(List<String> aList) {
+        if (isIfSequence(aList.get(0)))
+        {
+            
+        }
+
+        writeLever(aList.get(1));
+        if
+        mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
+        mFileWriter.write(pack(aList.get(1), "user_functions", "ISA"));
+        for (int i = 2; i < aList.size(); i += 2) {
+            mUsedTypes.add(aList.get(i));
+            mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
+            mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
+            mFileWriter.write(pack(aList.get(i + 1), "variable", "ISA"));
+        }
+    }
+
     public void streamDecoder(List<String> aList) {
         //writeLever(aList.get(0));
-        mFileWriter.write(pack(aList.get(0), "input_stream", "ISA"));
+        //mFileWriter.write(pack(aList.get(0), "input_stream", "ISA"));
         for (int i = 2; i < aList.size(); i += 2) {
             String valueName = "value" + mAssignmentCounter++;
             writeLever(valueName);
-            mFileWriter.write(pack(aList.get(0), valueName, "read"));
             mFileWriter.write(pack(aList.get(i), valueName, "assignment"));
+            mFileWriter.write(pack(aList.get(0), valueName, "read"));
         }
     }
 
