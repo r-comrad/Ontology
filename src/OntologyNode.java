@@ -79,6 +79,8 @@ public class OntologyNode {
             CircleManager circle = circleQueue.remove();
             String connectionName = connectionNameQueue.remove();
 
+            //if (painted.contains(node.getCommandName())) {continue;}
+
             painted.add(node.getCommandName());
             Pair<Double, Double> center = circle.getCenter();
 

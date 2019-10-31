@@ -40,6 +40,10 @@ public class ProgramDecoder {
         mFileWriter.write(pack("start", "variable", "implement"));
     }
 
+    private void inputStreamPack() {
+        mFileWriter.write(pack("start", "input_stream", "implement"));
+    }
+
     private void userFunctionsPack() {
         mFileWriter.write(pack("start", "function", "implement"));
     }
@@ -48,6 +52,7 @@ public class ProgramDecoder {
         List<String> list = new ArrayList();
         int type = 0;
         boolean variablelsUsed = false;
+        boolean inputStreamUsed = false;
 
         startPack();
 
@@ -91,6 +96,7 @@ public class ProgramDecoder {
                 }
                 if (isStreamOutput(str)) {
                     type |= 8;
+                    inputStreamUsed = true;
                 }
 
                 if (!isUnusedSequence(str)) list.add(str);
@@ -99,6 +105,7 @@ public class ProgramDecoder {
 
         if (mUsedTypes.size() > 0) typesDecoder();
         if (variablelsUsed) variablePack();
+        if (inputStreamUsed) inputStreamPack();
         if (mUsedFunctions.size() > 0)
         {
             stdFunctionPack();
@@ -203,15 +210,13 @@ public class ProgramDecoder {
     }
 
     public void streamDecoder(List<String> aList) {
-        writeLever(aList.get(1));
-        
-        mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
-        mFileWriter.write(pack(aList.get(1), "user_functions", "ISA"));
+        //writeLever(aList.get(0));
+        mFileWriter.write(pack(aList.get(0), "input_stream", "ISA"));
         for (int i = 2; i < aList.size(); i += 2) {
-            mUsedTypes.add(aList.get(i));
-            mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
-            mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
-            mFileWriter.write(pack(aList.get(i + 1), "variable", "ISA"));
+            String valueName = "value" + mAssignmentCounter++;
+            writeLever(valueName);
+            mFileWriter.write(pack(aList.get(0), valueName, "read"));
+            mFileWriter.write(pack(aList.get(i), valueName, "assignment"));
         }
     }
 
