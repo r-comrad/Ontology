@@ -6,18 +6,28 @@ public class ProgramDecoder {
 
     private int mAssignmentCounter;
     private int mConditionCounter;
+    private int mConditionPartsCounter;
+
+    private int usedConditions;
 
     private HashSet<String> mUsedFunctions;
     private HashSet<String> mUsedTypes;
 
+    private String lastBlockLabel;
+
     ArrayList<Pair<String, String>> codeLevel;
 
     public ProgramDecoder() {
-        mFileReader = new MyFileReader("sqr_equ_code.cpp");
+        mFileReader = new MyFileReader("code.cpp");
         mFileWriter = new MyFileWriter("rdf code");
 
         mAssignmentCounter = 0;
         mConditionCounter = 0;
+        mConditionPartsCounter = 0;
+
+        usedConditions = 0;
+
+        lastBlockLabel = "_______bl";
 
         mUsedFunctions = new HashSet<>();
         mUsedTypes = new HashSet<>();
@@ -49,10 +59,10 @@ public class ProgramDecoder {
     }
 
     private void conditionPack() {
-        mFileWriter.write(pack("start", "condition", "implement"));
-        mFileWriter.write(pack("if", "condition", "ISA"));
-        mFileWriter.write(pack("if-else", "condition", "ISA"));
-        mFileWriter.write(pack("if-else_tree", "condition", "ISA"));
+        mFileWriter.write(pack("start", "conditions_types", "implement"));
+        if ((usedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "ISA"));
+        if ((usedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "ISA"));
+        if ((usedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "ISA"));
     }
 
     private void userFunctionsPack() {
@@ -82,8 +92,10 @@ public class ProgramDecoder {
 
                 if ((type & 8) != 0) streamDecoder(list);
 
+                if ((type & 16) != 0) conditionDecoder(list);
+
                 if (isLevelIncreaser(str)) {
-                    codeLevel.add(new Pair(list.get(1), "include"));
+                    codeLevel.add(new Pair(lastBlockLabel, "include"));
                 }
 
                 if (isLevelDecreaser(str)) {
@@ -109,6 +121,10 @@ public class ProgramDecoder {
                     type |= 8;
                     streamUsed = true;
                 }
+                if (isIfSequence(str) || isElseSequence(str)) {
+                    type |= 16;
+                }
+
 
                 if (!isUnusedSequence(str)) list.add(str);
             }
@@ -117,10 +133,16 @@ public class ProgramDecoder {
         if (mUsedTypes.size() > 0) typesDecoder();
         if (variablelsUsed) variablePack();
         if (streamUsed) inputStreamPack();
-        if (mUsedFunctions.size() > 0)
-        {
+
+        while (mUsedFunctions.contains("if"))mUsedFunctions.remove("if");
+        while (mUsedFunctions.contains("else"))mUsedFunctions.remove("else");
+
+        if (mUsedFunctions.size() > 0) {
             stdFunctionPack();
         }
+
+        conditionClouser();
+        if (usedConditions != 0) conditionPack();
 
         mFileWriter.close();
     }
@@ -139,19 +161,16 @@ public class ProgramDecoder {
     private void stdFunctionPack() {
         mFileWriter.write(pack("std_functions", "function", "AKO"));
         MyFileReader fileReader = new MyFileReader("std_functions.txt");
-        int groupsCount= Integer.parseInt(fileReader.read());
+        int groupsCount = Integer.parseInt(fileReader.read());
 
         for (int i = 0; i < groupsCount; ++i) {
             String parent = fileReader.read();
-            int groupsSize= Integer.parseInt(fileReader.read());
+            int groupsSize = Integer.parseInt(fileReader.read());
             boolean isFirstWrite = true;
-            for(int j = 0; j < groupsSize; ++j)
-            {
+            for (int j = 0; j < groupsSize; ++j) {
                 String funkName = fileReader.read();
-                if (mUsedFunctions.contains(funkName))
-                {
-                    if (isFirstWrite)
-                    {
+                if (mUsedFunctions.contains(funkName)) {
+                    if (isFirstWrite) {
                         isFirstWrite = false;
                         mFileWriter.write(pack(parent + "_functions", "std_functions", "AKO"));
                     }
@@ -221,6 +240,7 @@ public class ProgramDecoder {
     }
 
     public void functionDecoder(List<String> aList) {
+        lastBlockLabel = aList.get(1);
         writeLever(aList.get(1));
 
         mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
@@ -233,21 +253,49 @@ public class ProgramDecoder {
         }
     }
 
-    public void conditionDecoder(List<String> aList) {
-        if (isIfSequence(aList.get(0)))
-        {
-            
+    public void conditionClouser() {
+        String conditionName = "condition" + mConditionCounter;
+        String parent = "__________";
+        if (mConditionPartsCounter == 1) {
+            parent = "if";
+            usedConditions |= 1;
+        } else if (mConditionPartsCounter == 2) {
+            parent = "if-else";
+            usedConditions |= 2;
+        } else if (mConditionPartsCounter > 2) {
+            parent = "tree";
+            usedConditions |= 4;
         }
+        mFileWriter.write(pack(conditionName, parent, "ISA"));
+    }
 
-        writeLever(aList.get(1));
-        if
-        mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
-        mFileWriter.write(pack(aList.get(1), "user_functions", "ISA"));
-        for (int i = 2; i < aList.size(); i += 2) {
-            mUsedTypes.add(aList.get(i));
-            mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
-            mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
-            mFileWriter.write(pack(aList.get(i + 1), "variable", "ISA"));
+    public void conditionDecoder(List<String> aList) {
+        // TODO: if else if (2 условия)
+
+        if (isIfSequence(aList.get(0))) {
+            conditionClouser();
+            ++mConditionCounter;
+            mConditionPartsCounter = 0;
+        }
+        String conditionName = "condition" + mConditionCounter;
+
+        String blockName = "__________";
+        if (isIfSequence(aList.get(0))) {
+            blockName = "if" + mConditionCounter + "_" + mConditionPartsCounter++;
+        } else if (aList.size() > 1 && isElseIfSequence(aList.get(0), aList.get(1))) {
+            blockName = "else-if_block" + mConditionCounter + "_" + mConditionPartsCounter++;
+        } else if (isElseSequence(aList.get(0))) {
+            blockName = "else_block" + mConditionCounter + "_" + mConditionPartsCounter++;
+        }
+        lastBlockLabel = blockName;
+
+        writeLever(conditionName);
+        mFileWriter.write(pack(blockName, conditionName, "has_part"));
+
+        for (int i = 1; i < aList.size(); ++i) {
+            if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
+                    aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
+                mFileWriter.write(pack(blockName, aList.get(i), "use"));
         }
     }
 
