@@ -40,6 +40,8 @@ public class ProgramDecoder {
 
     private void startPack() {
         mFileWriter.write(pack("start", "function", "implement"));
+        mFileWriter.write(pack("function", "types", "take"));
+        mFileWriter.write(pack("function", "types", "return"));
         mFileWriter.write(pack("user_functions", "function", "AKO"));
         mFileWriter.write(pack("start", "types", "implement"));
         mFileWriter.write(pack("basic", "types", "AKO"));
