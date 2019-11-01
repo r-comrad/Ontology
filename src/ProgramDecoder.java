@@ -35,7 +35,7 @@ public class ProgramDecoder {
         mUsedTypes = new HashSet<>();
 
         codeLevel = new ArrayList<>();
-        codeLevel.add(new Pair("start", "include"));
+        codeLevel.add(new Pair("start", "implement"));
     }
 
     private void startPack() {
@@ -46,27 +46,29 @@ public class ProgramDecoder {
     }
 
     private void writeLever(String str) {
-        mFileWriter.write(pack(str, codeLevel.get(codeLevel.size() - 1).mX,
+        mFileWriter.write(pack(codeLevel.get(codeLevel.size() - 1).mX, str,
                 codeLevel.get(codeLevel.size() - 1).mY));
     }
 
     private void variablePack() {
         mFileWriter.write(pack("start", "variable", "implement"));
+        mFileWriter.write(pack("variable", "types", "has_part"));
     }
 
     private void inputStreamPack() {
-        mFileWriter.write(pack("start", "input_stream", "implement"));
-        mFileWriter.write(pack("cin", "input_stream", "ISA"));
-        mFileWriter.write(pack("cout", "input_stream", "ISA"));
+        mFileWriter.write(pack("start", "data_stream", "implement"));
+        mFileWriter.write(pack("cin", "data_stream", "ISA"));
+        mFileWriter.write(pack("cout", "data_stream", "ISA"));
     }
 
     private void conditionPack() {
         mFileWriter.write(pack("start", "conditions_types", "implement"));
-        if ((mUsedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "ISA"));
-        if ((mUsedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "ISA"));
-        if ((mUsedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "ISA"));
+        if ((mUsedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "AKO"));
+        if ((mUsedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "AKO"));
+        if ((mUsedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "AKO"));
     }
 
+    // TODO:
     private void userFunctionsPack() {
         mFileWriter.write(pack("start", "function", "implement"));
     }
@@ -97,7 +99,7 @@ public class ProgramDecoder {
                 if ((type & 16) != 0) conditionDecoder(list);
 
                 if (isLevelIncreaser(str)) {
-                    codeLevel.add(new Pair(lastBlockLabel, "include"));
+                    codeLevel.add(new Pair(lastBlockLabel, "has_part"));
                 }
 
                 if (isLevelDecreaser(str)) {
@@ -180,7 +182,7 @@ public class ProgramDecoder {
                 if (mUsedFunctions.contains(funkName)) {
                     if (isFirstWrite) {
                         isFirstWrite = false;
-                        mFileWriter.write(pack(parent + "_functions", "std_functions", "AKO"));
+                        mFileWriter.write(pack(parent + "_functions", "std_functions", "ISA"));
                     }
                     mFileWriter.write(pack(funkName, parent + "_functions", "ISA"));
                 }
@@ -303,18 +305,18 @@ public class ProgramDecoder {
         lastBlockLabel = blockName;
         mLastBlockIsCondition = true;
 
-        mFileWriter.write(pack(blockName, conditionName, "has_part"));
+        mFileWriter.write(pack(conditionName, blockName, "has_part"));
 
         for (int i = 1 + offset; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
-                mFileWriter.write(pack(blockName, aList.get(i), "use"));
+                mFileWriter.write(pack(blockName, aList.get(i), "take"));
         }
     }
 
     public void streamDecoder(List<String> aList) {
         //writeLever(aList.get(0));
-        //mFileWriter.write(pack(aList.get(0), "input_stream", "ISA"));
+        //mFileWriter.write(pack(aList.get(0), "data_stream", "ISA"));
         for (int i = 2; i < aList.size(); i += 2) {
             String valueName = "value" + mAssignmentCounter++;
             writeLever(valueName);
