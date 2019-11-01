@@ -8,12 +8,13 @@ public class ProgramDecoder {
     private int mConditionCounter;
     private int mConditionPartsCounter;
 
-    private int usedConditions;
+    private int mUsedConditions;
 
     private HashSet<String> mUsedFunctions;
     private HashSet<String> mUsedTypes;
 
     private String lastBlockLabel;
+    private boolean mLastBlockIsCondition;
 
     ArrayList<Pair<String, String>> codeLevel;
 
@@ -25,9 +26,10 @@ public class ProgramDecoder {
         mConditionCounter = 0;
         mConditionPartsCounter = 0;
 
-        usedConditions = 0;
+        mUsedConditions = 0;
 
-        lastBlockLabel = "_______bl";
+        lastBlockLabel = "________bl";
+        mLastBlockIsCondition =false;
 
         mUsedFunctions = new HashSet<>();
         mUsedTypes = new HashSet<>();
@@ -60,9 +62,9 @@ public class ProgramDecoder {
 
     private void conditionPack() {
         mFileWriter.write(pack("start", "conditions_types", "implement"));
-        if ((usedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "ISA"));
-        if ((usedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "ISA"));
-        if ((usedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "ISA"));
+        if ((mUsedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "ISA"));
+        if ((mUsedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "ISA"));
+        if ((mUsedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "ISA"));
     }
 
     private void userFunctionsPack() {
@@ -99,6 +101,13 @@ public class ProgramDecoder {
                 }
 
                 if (isLevelDecreaser(str)) {
+                    if (!mLastBlockIsCondition)
+                    {
+                        conditionClouser();
+                    }
+                    else {
+                        mLastBlockIsCondition = false;
+                    }
                     codeLevel.remove(codeLevel.size() - 1);
                 }
 
@@ -141,8 +150,7 @@ public class ProgramDecoder {
             stdFunctionPack();
         }
 
-        conditionClouser();
-        if (usedConditions != 0) conditionPack();
+        if (mUsedConditions != 0) conditionPack();
 
         mFileWriter.close();
     }
@@ -254,18 +262,21 @@ public class ProgramDecoder {
     }
 
     public void conditionClouser() {
+        if(mConditionPartsCounter == 0) return;
+
         String conditionName = "condition" + mConditionCounter;
-        String parent = "__________";
+        String parent = "________pr";
         if (mConditionPartsCounter == 1) {
             parent = "if";
-            usedConditions |= 1;
+            mUsedConditions |= 1;
         } else if (mConditionPartsCounter == 2) {
             parent = "if-else";
-            usedConditions |= 2;
+            mUsedConditions |= 2;
         } else if (mConditionPartsCounter > 2) {
-            parent = "tree";
-            usedConditions |= 4;
+            parent = "if-else_tree";
+            mUsedConditions |= 4;
         }
+        writeLever(conditionName);
         mFileWriter.write(pack(conditionName, parent, "ISA"));
     }
 
@@ -279,20 +290,22 @@ public class ProgramDecoder {
         }
         String conditionName = "condition" + mConditionCounter;
 
-        String blockName = "__________";
+        int offset = 0;
+        String blockName = "________bn";
         if (isIfSequence(aList.get(0))) {
-            blockName = "if" + mConditionCounter + "_" + mConditionPartsCounter++;
+            blockName = "if" + "_" + mConditionCounter + "_" + mConditionPartsCounter++;
         } else if (aList.size() > 1 && isElseIfSequence(aList.get(0), aList.get(1))) {
-            blockName = "else-if_block" + mConditionCounter + "_" + mConditionPartsCounter++;
+            blockName = "else-if_block" +"_" +  mConditionCounter + "_" + mConditionPartsCounter++;
+            ++offset;
         } else if (isElseSequence(aList.get(0))) {
-            blockName = "else_block" + mConditionCounter + "_" + mConditionPartsCounter++;
+            blockName = "else_block" + "_" + mConditionCounter + "_" + mConditionPartsCounter++;
         }
         lastBlockLabel = blockName;
+        mLastBlockIsCondition = true;
 
-        writeLever(conditionName);
         mFileWriter.write(pack(blockName, conditionName, "has_part"));
 
-        for (int i = 1; i < aList.size(); ++i) {
+        for (int i = 1 + offset; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
                 mFileWriter.write(pack(blockName, aList.get(i), "use"));
@@ -322,17 +335,17 @@ public class ProgramDecoder {
         String valueName = "value" + mAssignmentCounter++;
         writeLever(valueName);
         mFileWriter.write(pack(aList.get(0), valueName, "assignment"));
-        boolean usesNumeric = false;
+        //boolean usesNumeric = false;
 
         for (int i = 1; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
                 mFileWriter.write(pack(valueName, aList.get(i), "use"));
-            else usesNumeric = true;
+            //else usesNumeric = true;
         }
 
-        if (usesNumeric) {
-            mFileWriter.write(pack(valueName, "numeric", "use"));
-        }
+        //if (usesNumeric) {
+         //   mFileWriter.write(pack(valueName, "numeric", "use"));
+        //}
     }
 }
