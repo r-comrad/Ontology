@@ -12,6 +12,7 @@ public class ProgramDecoder {
 
     private HashSet<String> mUsedFunctions;
     private HashSet<String> mUsedTypes;
+    private HashSet<String> mUsedContainers;
 
     private String lastBlockLabel;
     private boolean mLastBlockIsCondition;
@@ -33,46 +34,63 @@ public class ProgramDecoder {
 
         mUsedFunctions = new HashSet<>();
         mUsedTypes = new HashSet<>();
+        mUsedContainers = new HashSet<>();
 
         codeLevel = new ArrayList<>();
         codeLevel.add(new Pair("start", "implement"));
     }
 
     private void startPack() {
-        mFileWriter.write(pack("start", "function", "implement"));
+        mFileWriter.write(pack("function", "start", "implement"));
         mFileWriter.write(pack("function", "types", "take"));
         mFileWriter.write(pack("function", "types", "return"));
         mFileWriter.write(pack("user_functions", "function", "AKO"));
-        mFileWriter.write(pack("start", "types", "implement"));
-        mFileWriter.write(pack("basic", "types", "AKO"));
+        mFileWriter.write(pack("types", "start", "implement"));
+        mFileWriter.write(pack("basic_types", "types", "AKO"));
+
+        mFileWriter.write(pack("variable", "start", "implement"));
+        mFileWriter.write(pack("variable", "types", "has_type"));
     }
 
     private void writeLever(String str) {
-        mFileWriter.write(pack(codeLevel.get(codeLevel.size() - 1).mX, str,
+        //mFileWriter.write(pack(codeLevel.get(codeLevel.size() - 1).mX, str,
+        //        codeLevel.get(codeLevel.size() - 1).mY));
+                mFileWriter.write(pack(str, codeLevel.get(codeLevel.size() - 1).mX,
                 codeLevel.get(codeLevel.size() - 1).mY));
     }
 
     private void variablePack() {
-        mFileWriter.write(pack("start", "variable", "implement"));
-        mFileWriter.write(pack("variable", "types", "has_part"));
+        mFileWriter.write(pack("basic_variable", "variable", "AKO"));
     }
 
     private void inputStreamPack() {
-        mFileWriter.write(pack("start", "data_stream", "implement"));
+        mFileWriter.write(pack("data_stream", "start", "implement"));
         mFileWriter.write(pack("cin", "data_stream", "ISA"));
         mFileWriter.write(pack("cout", "data_stream", "ISA"));
     }
 
     private void conditionPack() {
-        mFileWriter.write(pack("start", "conditions_types", "implement"));
+        mFileWriter.write(pack("conditions_types", "start", "implement"));
         if ((mUsedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "AKO"));
         if ((mUsedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "AKO"));
         if ((mUsedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "AKO"));
     }
 
+    private void containersPack() {
+        mFileWriter.write(pack("container_types", "types", "AKO"));
+        mFileWriter.write(pack("container", "variable", "AKO"));
+
+        Iterator<String> i = mUsedContainers.iterator();
+        while (i.hasNext())
+        {
+            String cur = i.next();
+            mFileWriter.write(pack(cur, "container_types", "ISA"));
+        }
+    }
+
     // TODO:
     private void userFunctionsPack() {
-        mFileWriter.write(pack("start", "function", "implement"));
+        mFileWriter.write(pack("function", "start", "implement"));
     }
 
     public void process() {
@@ -99,6 +117,8 @@ public class ProgramDecoder {
                 if ((type & 8) != 0) streamDecoder(list);
 
                 if ((type & 16) != 0) conditionDecoder(list);
+
+                if ((type & 32) != 0) containerDecoder(list);
 
                 if (isLevelIncreaser(str)) {
                     codeLevel.add(new Pair(lastBlockLabel, "has_part"));
@@ -137,7 +157,9 @@ public class ProgramDecoder {
                 if (isIfSequence(str) || isElseSequence(str)) {
                     type |= 16;
                 }
-
+                if (isContainerSequence(str)) {
+                    type |= 32;
+                }
 
                 if (!isUnusedSequence(str)) list.add(str);
             }
@@ -153,7 +175,9 @@ public class ProgramDecoder {
         if (mUsedFunctions.size() > 0) {
             stdFunctionPack();
         }
-
+        if (mUsedContainers.size() > 0) {
+            containersPack();
+        }
         if (mUsedConditions != 0) conditionPack();
 
         mFileWriter.close();
@@ -213,6 +237,11 @@ public class ProgramDecoder {
                 || Objects.equals(s, "char") || Objects.equals(s, "bool") || Objects.equals(s, "void");
     }
 
+    public boolean isContainerSequence(String s) {
+        return Objects.equals(s, "vector") || Objects.equals(s, "queue") || Objects.equals(s, "set")
+                || Objects.equals(s, "map") || Objects.equals(s, "list");
+    }
+
     public boolean isAssignmentSequence(String s) {
         return Objects.equals(s, "=");
     }
@@ -261,7 +290,8 @@ public class ProgramDecoder {
             mUsedTypes.add(aList.get(i));
             mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
             mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
-            mFileWriter.write(pack(aList.get(i + 1), "variable", "ISA"));
+            //TODO: take container
+            mFileWriter.write(pack(aList.get(i + 1), "basic_variable", "ISA"));
         }
     }
 
@@ -327,11 +357,22 @@ public class ProgramDecoder {
         }
     }
 
+    // TODO: ofset for map
+    public void containerDecoder(List<String> aList) {
+        mUsedContainers.add(aList.get(0));
+        for (int i = 2; i < aList.size(); ++i) {
+            writeLever(aList.get(i));
+            mFileWriter.write(pack(aList.get(i), aList.get(0), "has_type"));
+            mFileWriter.write(pack(aList.get(i), aList.get(1), "stores"));
+            mFileWriter.write(pack(aList.get(i), "container", "ISA"));
+        }
+    }
+
     public void variableDeclarationDecoder(List<String> aList) {
         for (int i = 1; i < aList.size(); ++i) {
             writeLever(aList.get(i));
             mFileWriter.write(pack(aList.get(i), aList.get(0), "has_type"));
-            mFileWriter.write(pack(aList.get(i), "variable", "ISA"));
+            mFileWriter.write(pack(aList.get(i), "basic_variable", "ISA"));
         }
     }
 

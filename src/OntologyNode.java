@@ -73,6 +73,43 @@ public class OntologyNode {
         Queue<String> connectionNameQueue = new LinkedList<>();
         connectionNameQueue.offer("");
 
+
+
+        Map<String, Map<String, String>> table;
+        Map<String, String> start;
+        table = new HashMap<>();
+        start = new HashMap<>();
+
+        start.put("ISA", "nun");
+        start.put("AKO", "nun");
+        start.put("has_part", "nun");
+        start.put("has_type", "nun");
+        start.put("assignment", "nun");
+        start.put("read", "nun");       //?
+        start.put("write", "nun");      //?
+        start.put("stores", "nun");
+        start.put("use", "nun");
+        start.put("take", "nun");
+        start.put("return", "nun");
+        start.put("implement", "nun");
+
+        table.put("start", start);
+
+        List list = new ArrayList();
+        list.add("ISA");
+        list.add("AKO");
+        list.add("has_part");
+        list.add("has_type");
+        list.add("assignment");
+        list.add("read");       //?
+        list.add("write");      //?
+        list.add("stores");
+        list.add("use");
+        list.add("take");
+        list.add("return");
+        list.add("implement");
+
+
         while (!nodeQueue.isEmpty()) {
             OntologyNode node = nodeQueue.remove();
             Object previousVertex = vertexQueue.remove();
@@ -104,6 +141,7 @@ public class OntologyNode {
             int countConnections = 0;
             for (Map.Entry<String, Pair<String, OntologyNode>> entry : node.mConnections.entrySet()) {
                 OntologyNode drawTarget = entry.getValue().getSecond();
+
                 if (!painted.contains(drawTarget.getCommandName())) {
                     ++countConnections;
                 }
@@ -123,8 +161,46 @@ public class OntologyNode {
 
                     circle.rotatePoint();
                 }
+
+
+                String obj = drawTarget.getCommandName(), subj = node.getCommandName(), pred = nextConnectionName;
+                if (!pred.startsWith("-")) continue;
+                pred = pred.substring(1);
+
+                Map<String, String> new_val = table.get(obj), parent = table.get(subj);
+                boolean reach = false;
+                if (new_val == null ) new_val = new HashMap<>(parent);
+                else
+                {
+                    for (Map.Entry<String, String> i : parent.entrySet()) {
+                        if (!Objects.equals(i.getKey(), pred) && !reach) continue;
+                        reach = true;
+
+                        new_val.put(i.getKey(), i.getValue());
+                    }
+                }
+                new_val.put(pred, subj);
+                table.put(obj, new_val);
             }
         }
+
+
+
+        MyFileWriter ans = new MyFileWriter("ans.txt");
+        ans.write("name;" );
+            for (Map.Entry<String, String> j : table.get("start").entrySet()) {
+                ans.write(j.getKey() + ";" );
+            }
+        ans.write("\n" );
+
+        for (Map.Entry<String, Map<String, String>> i : table.entrySet()) {
+            ans.write(i.getKey() + ";" );
+            for (Map.Entry<String, String> j : i.getValue().entrySet()) {
+                ans.write(j.getValue() + ";" );
+            }
+            ans.write("\n" );
+        }
+        ans.close();
     }
 
     private void draw(mxGraph aGraph, Object aParent, Object aStartVertex, CircleManager aCircle,

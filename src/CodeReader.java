@@ -1,3 +1,5 @@
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class CodeReader {
@@ -20,6 +22,8 @@ public class CodeReader {
     }
 
     public void process() {
+
+
         String obj, subj, pred;
         while (!Objects.equals(obj = mReader.read(), "") &&
                 !Objects.equals(subj = mReader.read(), "")&&
