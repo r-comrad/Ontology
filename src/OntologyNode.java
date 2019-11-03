@@ -77,8 +77,8 @@ public class OntologyNode {
 
         Map<String, Map<String, String>> table;
         Map<String, String> start;
-        table = new HashMap<>();
-        start = new HashMap<>();
+        table = new LinkedHashMap <>();
+        start = new LinkedHashMap <>();
 
         start.put("ISA", "nun");
         start.put("AKO", "nun");
@@ -95,7 +95,7 @@ public class OntologyNode {
 
         table.put("start", start);
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList();
         list.add("ISA");
         list.add("AKO");
         list.add("has_part");
@@ -168,15 +168,14 @@ public class OntologyNode {
                 pred = pred.substring(1);
 
                 Map<String, String> new_val = table.get(obj), parent = table.get(subj);
-                boolean reach = false;
-                if (new_val == null ) new_val = new HashMap<>(parent);
+                if (new_val == null ) new_val = new LinkedHashMap <>(parent);
                 else
                 {
-                    for (Map.Entry<String, String> i : parent.entrySet()) {
-                        if (!Objects.equals(i.getKey(), pred) && !reach) continue;
-                        reach = true;
+                    int num = list.indexOf(pred);
 
-                        new_val.put(i.getKey(), i.getValue());
+                    for (int i = num + 1; i < list.size(); ++i) {
+                        String conName = list.get(i);
+                        new_val.put(conName, parent.get(conName));
                     }
                 }
                 new_val.put(pred, subj);
@@ -188,9 +187,9 @@ public class OntologyNode {
 
         MyFileWriter ans = new MyFileWriter("ans.txt");
         ans.write("name;" );
-            for (Map.Entry<String, String> j : table.get("start").entrySet()) {
-                ans.write(j.getKey() + ";" );
-            }
+        for (Map.Entry<String, String> j : table.get("start").entrySet()) {
+            ans.write(j.getKey() + ";" );
+        }
         ans.write("\n" );
 
         for (Map.Entry<String, Map<String, String>> i : table.entrySet()) {
