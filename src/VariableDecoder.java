@@ -35,7 +35,11 @@ public class VariableDecoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public boolean isTypeSequence(String aStr) {
+    public boolean isVariableSequence(String aStr) {
+        return isTypeSequence(aStr) || isBasicAssignmentSequence(aStr);
+    }
+
+    private boolean isTypeSequence(String aStr) {
         return isBasicTypeSequence(aStr) || isContainerSequence(aStr);
     }
 
@@ -61,22 +65,22 @@ public class VariableDecoder {
     }
 
     private void variablePack() {
-        mRDFWriter.write("types", "start", "implement");
-        mRDFWriter.write("basic_types", "types", "AKO");
+        mRDFWriter.write("type", "start", "implement");
+        mRDFWriter.write("basic_type", "type", "AKO");
 
         //TODO: no variables
         mRDFWriter.write("variable", "start", "implement");
-        mRDFWriter.write("variable", "types", "has_type");
+        mRDFWriter.write("variable", "type", "has_type");
     }
 
     private void containerPack() {
-        mRDFWriter.write("container_types", "types", "AKO");
+        mRDFWriter.write("container_type", "type", "AKO");
         mRDFWriter.write("container", "variable", "AKO");
 
         Iterator<String> i = mUsedContainers.iterator();
         while (i.hasNext())
         {
-            mRDFWriter.write(i.next(), "container_types", "ISA");
+            mRDFWriter.write(i.next(), "container_type", "ISA");
         }
     }
 
@@ -85,7 +89,7 @@ public class VariableDecoder {
         for(String i : mUsedBasicTypes)
         {
             //if (mUsedTypes.contains(parent))
-            mRDFWriter.write(i, "basic_types", "ISA");
+            mRDFWriter.write(i, "basic_type", "ISA");
         }
     }
 
@@ -129,7 +133,7 @@ public class VariableDecoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public void infunktionDeclarationDecoder(List<String> aList) {
+    public void infunctionDeclarationDecoder(List<String> aList) {
         if (isContainerSequence(aList.get(0)))
         {
             aList.remove(2);
