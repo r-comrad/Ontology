@@ -1,18 +1,18 @@
 import java.util.*;
 
+
+enum BlockType {
+    NUN, FUNKTION, VARIABLE, CONDITION;
+}
+
 public class ProgramDecoder {
     private MyFileReader mFileReader;
-    private MyFileWriter mFileWriter;
 
-    private int mAssignmentCounter;
     private int mConditionCounter;
     private int mConditionPartsCounter;
-
     private int mUsedConditions;
 
     private HashSet<String> mUsedFunctions;
-    private HashSet<String> mUsedTypes;
-    private HashSet<String> mUsedContainers;
 
     private String lastBlockLabel;
     private boolean mLastBlockIsCondition;
@@ -45,11 +45,9 @@ public class ProgramDecoder {
         mFileWriter.write(pack("function", "types", "take"));
         mFileWriter.write(pack("function", "types", "return"));
         mFileWriter.write(pack("user_functions", "function", "AKO"));
-        mFileWriter.write(pack("types", "start", "implement"));
-        mFileWriter.write(pack("basic_types", "types", "AKO"));
 
-        mFileWriter.write(pack("variable", "start", "implement"));
-        mFileWriter.write(pack("variable", "types", "has_type"));
+
+
     }
 
     private void writeLever(String str) {
@@ -59,9 +57,6 @@ public class ProgramDecoder {
                 codeLevel.get(codeLevel.size() - 1).mY));
     }
 
-    private void variablePack() {
-        mFileWriter.write(pack("basic_variable", "variable", "AKO"));
-    }
 
     private void inputStreamPack() {
         mFileWriter.write(pack("data_stream", "start", "implement"));
@@ -76,17 +71,6 @@ public class ProgramDecoder {
         if ((mUsedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "AKO"));
     }
 
-    private void containersPack() {
-        mFileWriter.write(pack("container_types", "types", "AKO"));
-        mFileWriter.write(pack("container", "variable", "AKO"));
-
-        Iterator<String> i = mUsedContainers.iterator();
-        while (i.hasNext())
-        {
-            String cur = i.next();
-            mFileWriter.write(pack(cur, "container_types", "ISA"));
-        }
-    }
 
     // TODO:
     private void userFunctionsPack() {
@@ -183,38 +167,9 @@ public class ProgramDecoder {
         mFileWriter.close();
     }
 
-    private void typesDecoder() {
-        MyFileReader fileReader = new MyFileReader("basic_types.txt");
-        int count = Integer.parseInt(fileReader.read());
-        for (int i = 0; i < count; ++i) {
-            String parent = fileReader.read();
-            String concept = fileReader.read();
-            String connection = fileReader.read();
-            if (mUsedTypes.contains(parent)) mFileWriter.write(pack(parent, concept, connection));
-        }
-    }
 
-    private void stdFunctionPack() {
-        mFileWriter.write(pack("std_functions", "function", "AKO"));
-        MyFileReader fileReader = new MyFileReader("std_functions.txt");
-        int groupsCount = Integer.parseInt(fileReader.read());
 
-        for (int i = 0; i < groupsCount; ++i) {
-            String parent = fileReader.read();
-            int groupsSize = Integer.parseInt(fileReader.read());
-            boolean isFirstWrite = true;
-            for (int j = 0; j < groupsSize; ++j) {
-                String funkName = fileReader.read();
-                if (mUsedFunctions.contains(funkName)) {
-                    if (isFirstWrite) {
-                        isFirstWrite = false;
-                        mFileWriter.write(pack(parent + "_functions", "std_functions", "ISA"));
-                    }
-                    mFileWriter.write(pack(funkName, parent + "_functions", "ISA"));
-                }
-            }
-        }
-    }
+
 
     public boolean isLevelIncreaser(String str) {
         return Objects.equals(str, "{");
@@ -232,23 +187,10 @@ public class ProgramDecoder {
         return Objects.equals(str, ";") || Objects.equals(str, "{") || Objects.equals(str, "}");
     }
 
-    public boolean isTypeSequence(String s) {
-        return Objects.equals(s, "int") || Objects.equals(s, "float") || Objects.equals(s, "double")
-                || Objects.equals(s, "char") || Objects.equals(s, "bool") || Objects.equals(s, "void");
-    }
 
-    public boolean isContainerSequence(String s) {
-        return Objects.equals(s, "vector") || Objects.equals(s, "queue") || Objects.equals(s, "set")
-                || Objects.equals(s, "map") || Objects.equals(s, "list");
-    }
 
-    public boolean isAssignmentSequence(String s) {
-        return Objects.equals(s, "=");
-    }
 
-    public boolean isFunctionalSequence(String s) {
-        return Objects.equals(s, "(");
-    }
+
 
     public boolean isIfSequence(String s) {
         return Objects.equals(s, "if");
@@ -280,20 +222,7 @@ public class ProgramDecoder {
         return s1 + " " + s2 + " " + s3 + "\n";
     }
 
-    public void functionDecoder(List<String> aList) {
-        lastBlockLabel = aList.get(1);
-        writeLever(aList.get(1));
 
-        mFileWriter.write(pack(aList.get(1), aList.get(0), "return"));
-        mFileWriter.write(pack(aList.get(1), "user_functions", "ISA"));
-        for (int i = 2; i < aList.size(); i += 2) {
-            mUsedTypes.add(aList.get(i));
-            mFileWriter.write(pack(aList.get(1), aList.get(i + 1), "take"));
-            mFileWriter.write(pack(aList.get(i + 1), aList.get(i), "has_type"));
-            //TODO: take container
-            mFileWriter.write(pack(aList.get(i + 1), "basic_variable", "ISA"));
-        }
-    }
 
     public void conditionClouser() {
         if(mConditionPartsCounter == 0) return;
@@ -357,40 +286,7 @@ public class ProgramDecoder {
         }
     }
 
-    // TODO: ofset for map
-    public void containerDecoder(List<String> aList) {
-        mUsedContainers.add(aList.get(0));
-        for (int i = 2; i < aList.size(); ++i) {
-            writeLever(aList.get(i));
-            mFileWriter.write(pack(aList.get(i), aList.get(0), "has_type"));
-            mFileWriter.write(pack(aList.get(i), aList.get(1), "stores"));
-            mFileWriter.write(pack(aList.get(i), "container", "ISA"));
-        }
-    }
 
-    public void variableDeclarationDecoder(List<String> aList) {
-        for (int i = 1; i < aList.size(); ++i) {
-            writeLever(aList.get(i));
-            mFileWriter.write(pack(aList.get(i), aList.get(0), "has_type"));
-            mFileWriter.write(pack(aList.get(i), "basic_variable", "ISA"));
-        }
-    }
 
-    public void variableAssignmentDecoder(List<String> aList) {
-        String valueName = "value" + mAssignmentCounter++;
-        writeLever(valueName);
-        mFileWriter.write(pack(aList.get(0), valueName, "assignment"));
-        //boolean usesNumeric = false;
 
-        for (int i = 1; i < aList.size(); ++i) {
-            if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
-                    aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
-                mFileWriter.write(pack(valueName, aList.get(i), "use"));
-            //else usesNumeric = true;
-        }
-
-        //if (usesNumeric) {
-         //   mFileWriter.write(pack(valueName, "numeric", "use"));
-        //}
-    }
 }

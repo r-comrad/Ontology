@@ -3,6 +3,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 public class MyFileReader {
@@ -39,6 +42,15 @@ public class MyFileReader {
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
             }
+        }
+        return result;
+    }
+
+    public HashSet<String> readAllWords() {
+        HashSet<String> result = new HashSet<>();
+        int count = Integer.parseInt(read());
+        for (int i = 0; i < count; ++i) {
+            result.add(read());
         }
         return result;
     }
