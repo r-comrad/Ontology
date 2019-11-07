@@ -1,20 +1,18 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class CodeReader {
 
     private MyFileReader mReader;
-    OntologyNode mOntology;
+    OntologyTree mOntology;
 
-    public CodeReader(OntologyNode aOntology, String aFileName) {
+    public CodeReader(OntologyTree aOntology, String aFileName) {
         mOntology = aOntology;
         mReader = new MyFileReader(aFileName);
 
         process();
     }
 
-    public CodeReader(OntologyNode aOntology) {
+    public CodeReader(OntologyTree aOntology) {
         mOntology = aOntology;
         mReader = new MyFileReader("rdf code");
 
@@ -28,30 +26,31 @@ public class CodeReader {
         while (!Objects.equals(obj = mReader.read(), "") &&
                 !Objects.equals(subj = mReader.read(), "")&&
                 !Objects.equals(pred = mReader.read(), "")) {
-            OntologyNode nodeFrom = mOntology.findNode(obj);
-            OntologyNode nodeTo = mOntology.findNode(subj);
+            //OntologyTree nodeFrom = mOntology.findNode(obj);
+            //OntologyTree nodeTo = mOntology.findNode(subj);
 
-            if (nodeFrom == null) nodeFrom = new OntologyNode(obj);
-            if (nodeTo == null) nodeTo = new OntologyNode(subj);
+            //if (nodeFrom == null) nodeFrom = new OntologyTree(obj);
+            //if (nodeTo == null) nodeTo = new OntologyTree(subj);
 
-            nodeFrom.addConnection(nodeTo, pred);
+            //nodeFrom.addConnection(nodeTo, pred);
+            mOntology.addConnection(obj, pred, subj);
         }
     }
 
     public void funkParser() {
-       /* OntologyNode parentNode = mOntology.findNode("function");
+       /* OntologyTree parentNode = mOntology.findNode("function");
         String funkName = mReader.read();
-        OntologyNode funkNode = new OntologyNode(funkName);
+        OntologyTree funkNode = new OntologyTree(funkName);
         parentNode.addConnection(funkNode, "AKA");
 
         String returnType = mReader.read();
-        OntologyNode returnTypeNode = mOntology.findNode(returnType);
+        OntologyTree returnTypeNode = mOntology.findNode(returnType);
         funkNode.addConnection(returnTypeNode, "return");
 
         int argsCount = Integer.parseInt(mReader.read());
         for (int i = 0; i < argsCount; ++i) {
             String argType = mReader.read();
-            OntologyNode argTypeNode = mOntology.findNode(argType);
+            OntologyTree argTypeNode = mOntology.findNode(argType);
             funkNode.addConnection(argTypeNode, "take");
         }*/
     }
