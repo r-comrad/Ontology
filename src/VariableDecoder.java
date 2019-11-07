@@ -19,18 +19,24 @@ public class VariableDecoder {
         mRDFWriter = aRDFWriter;
         mAssignmentCounter = 0;
 
-        MyFileReader typesFile = new MyFileReader("../res/words", "basic_types.txt");
-        mUsedBasicTypes = typesFile.readAllWords();
-        typesFile = new MyFileReader("../res/words", "containers.txt");
-        mUsedContainers = typesFile.readAllWords();
+        mUsedBasicTypes = new HashSet<>();
+        mUsedContainers = new HashSet<>();
+
+        //TODO: standart path ../   ./
+        MyFileReader typesFile = new MyFileReader("words/basic_types.txt");
+        mBasicTypesList = typesFile.readAllWords();
+        typesFile = new MyFileReader("words/containers.txt");
+        mContainersList = typesFile.readAllWords();
     }
 
-    public void process(List<String> aList)
+    public List<String> process(List<String> aList)
     {
+        List <String> result = new ArrayList<>();
         //TODO: const types
-        if (isBasicTypeSequence(aList.get(0))) basicVariableDeclarationDecoder(aList);
-        else if(isContainerSequence(aList.get(0))) containerDeclarationDecoder(aList);
-        else if(isBasicAssignmentSequence(aList.get(0))) basicVariableAssignmentDecoder(aList);
+        if (isBasicTypeSequence(aList.get(0))) result = basicVariableDeclarationDecoder(aList);
+        else if(isContainerSequence(aList.get(0))) result = containerDeclarationDecoder(aList);
+        else if(isBasicAssignmentSequence(aList.get(0))) result = basicVariableAssignmentDecoder(aList);
+        return result;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -95,16 +101,21 @@ public class VariableDecoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    private void basicVariableDeclarationDecoder(List<String> aList) {
+    private List<String> basicVariableDeclarationDecoder(List<String> aList) {
+        List <String> result = new ArrayList<>();
         mUsedBasicTypes.add(aList.get(0));
         for (int i = 1; i < aList.size(); ++i) {
             //writeLever(aList.get(i));
             mRDFWriter.write(aList.get(i), aList.get(0), "has_type");
             mRDFWriter.write(aList.get(i), "basic_variable", "ISA");
+            result.add(aList.get(i));
         }
+        return result;
     }
 
-    private void basicVariableAssignmentDecoder(List<String> aList) {
+    private List<String> basicVariableAssignmentDecoder(List<String> aList) {
+        List <String> result = new ArrayList<>();
+        result.add(aList.get(0));
         String valueName = "value" + mAssignmentCounter++;
         //writeLever(valueName);
         mRDFWriter.write(aList.get(0), valueName, "assignment");
@@ -114,19 +125,23 @@ public class VariableDecoder {
                 mRDFWriter.write(valueName, aList.get(i), "use");
             //TODO: use -> has_part
         }
+        return result;
     }
 
     //------------------------------------------------------------------------------------------------------------------
 
     // TODO: ofset for map
-    private void containerDeclarationDecoder(List<String> aList) {
+    private List <String> containerDeclarationDecoder(List<String> aList) {
+        List <String> result = new ArrayList<>();
         mUsedContainers.add(aList.get(0));
         for (int i = 2; i < aList.size(); ++i) {
             //writeLever(aList.get(i));
+            result.add(aList.get(i));
             mRDFWriter.write(aList.get(i), aList.get(0), "has_type");
             mRDFWriter.write(aList.get(i), aList.get(1), "stores");
             mRDFWriter.write(aList.get(i), "container", "ISA");
         }
+        return result;
     }
 
     private void containerAssignmentDecoder(List<String> aList) {}

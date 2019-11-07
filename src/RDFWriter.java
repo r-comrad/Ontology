@@ -14,6 +14,10 @@ public class RDFWriter {
         mFileWriter.write(resultingString);
     }
 
+    public void writeLever(String aObject, Pair<String, String> aParent) {
+        write(aParent.mX, aParent.mY, aObject);
+    }
+
     public void close()
     {
         mFileWriter.close();

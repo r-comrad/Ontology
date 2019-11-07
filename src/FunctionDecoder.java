@@ -1,6 +1,4 @@
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class FunctionDecoder {
     private RDFWriter mRDFWriter;
@@ -14,15 +12,16 @@ public class FunctionDecoder {
         mUsedFunctions= new HashSet<>();
     }
 
-    public String process(List<String> aList)
+    public List<String> process(List<String> aList)
     {
-        String result = "____fncDec";
+        List<String> result = new ArrayList<>();
         if (aList.size() > 1)
         {
             functionDecoder(aList);
-            result = aList.get(0)
+            result.add(aList.get(1));
         }
         //else stdFunctionPack();
+        //mRDFWriter.writeLever(result, aParent);
         return result;
     }
 

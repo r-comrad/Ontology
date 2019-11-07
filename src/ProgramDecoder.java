@@ -19,10 +19,10 @@ public class ProgramDecoder {
     private int mConditionPartsCounter;
     private int mUsedConditions;
 
-    private String lastBlockLabel;
+    private String lastBlock;
     private boolean mLastBlockIsCondition;
 
-    ArrayList<Pair<String, String>> codeLevel;
+    ArrayList<Pair<String, String>> mCodeLevel;
 
     public ProgramDecoder() {
         mFileReader = new MyFileReader("code.cpp");
@@ -33,34 +33,26 @@ public class ProgramDecoder {
         mFunctionDecoder = new FunctionDecoder(mRDFWriter);
         mVariableDecoder = new VariableDecoder(mRDFWriter);
 
-
-
-
-
         mConditionCounter = 0;
         mConditionPartsCounter = 0;
 
         mUsedConditions = 0;
 
-        lastBlockLabel = "________bl";
+        lastBlock = "________LB";
         mLastBlockIsCondition =false;
 
-        codeLevel = new ArrayList<>();
-        codeLevel.add(new Pair("start", "implement"));
+        mCodeLevel = new ArrayList<>();
+        mCodeLevel.add(new Pair("start", "implement"));
     }
 
     private void startPack() {
-
-
-
-
     }
 
     private void writeLever(String str) {
-        //mFileWriter.write(pack(codeLevel.get(codeLevel.size() - 1).mX, str,
-        //        codeLevel.get(codeLevel.size() - 1).mY));
-       //         mFileWriter.write(pack(str, codeLevel.get(codeLevel.size() - 1).mX,
-                codeLevel.get(codeLevel.size() - 1).mY));
+        //mFileWriter.write(pack(mCodeLevel.get(mCodeLevel.size() - 1).mX, str,
+        //        mCodeLevel.get(mCodeLevel.size() - 1).mY));
+       //         mFileWriter.write(pack(str, mCodeLevel.get(mCodeLevel.size() - 1).mX,
+          //      mCodeLevel.get(mCodeLevel.size() - 1).mY));
     }
 
 
@@ -85,18 +77,24 @@ public class ProgramDecoder {
         String str;
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
+                List<String> connections = new ArrayList<>();
                 if (mType == BlockType.VARIABLE)
                 {
-                    mVariableDecoder.process(list);
-                    writeLever(conditionName);
+                    connections = mVariableDecoder.process(list);
                 }
                 else if (mType == BlockType.FUNKTION) {
                     mVariableDecoder.infunctionDeclarationDecoder(list);
-                    lastBlockLabel = mFunctionDecoder.process(list);
+                    connections = mFunctionDecoder.process(list);
                 }
 
                 if (isLevelIncreaser(str)) {
-                    codeLevel.add(new Pair(lastBlockLabel, "has_part"));
+                    String lastBlockLabel = connections.get(0);
+                    mCodeLevel.add(new Pair(lastBlockLabel, "has_part"));
+                }
+
+                for(String i : connections)
+                {
+                    mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
                 }
 
                 list.clear();
@@ -190,7 +188,7 @@ public class ProgramDecoder {
         } else if (isElseSequence(aList.get(0))) {
             blockName = "else_block" + "_" + mConditionCounter + "_" + mConditionPartsCounter++;
         }
-        lastBlockLabel = blockName;
+        //lastBlockLabel = blockName;
         mLastBlockIsCondition = true;
 
        // mFileWriter.write(pack(conditionName, blockName, "has_part"));
@@ -207,7 +205,7 @@ public class ProgramDecoder {
         //mFileWriter.write(pack(aList.get(0), "data_stream", "ISA"));
         for (int i = 2; i < aList.size(); i += 2) {
        //     String valueName = "value" + mAssignmentCounter++;
-            writeLever(valueName);
+          //  writeLever(valueName);
         //    mFileWriter.write(pack(aList.get(i), valueName, "assignment"));
         //    mFileWriter.write(pack(aList.get(0), valueName, "read"));
         }
