@@ -17,7 +17,7 @@ public class ProgramDecoder {
     ArrayList<Pair<String, String>> mCodeLevel;
 
     public ProgramDecoder() {
-        mFileReader = new MyFileReader("code.cpp");
+        mFileReader = new MyFileReader("parsed_code.cpp");
         mRDFWriter = new RDFWriter();
 
         mType = BlockType.NUN;
@@ -27,7 +27,7 @@ public class ProgramDecoder {
         mConditionDecoder = new ConditionDecoder(mRDFWriter);
 
         mCodeLevel = new ArrayList<>();
-        mCodeLevel.add(new Pair("start", "implement"));
+        //mCodeLevel.add(new Pair("start", "implement"));
     }
 
     public void process() {
@@ -61,7 +61,7 @@ public class ProgramDecoder {
                 else {
                     for(String i : connections)
                     {
-                        mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
+                        if (mCodeLevel.size() > 0) mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
                     }
                 }
 

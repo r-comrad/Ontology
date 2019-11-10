@@ -8,6 +8,8 @@ public class ProgramPanel extends JPanel {
     //private CommandTreeNode mCommandTree;
 
     public ProgramPanel() {
+        CodeParser parser = new CodeParser();
+        parser.process();
         ProgramDecoder programDecoder = new ProgramDecoder();
         programDecoder.process();
 
@@ -40,6 +42,7 @@ public class ProgramPanel extends JPanel {
                 node.addConnection(newNode, "include");
             }
         }*/
+
 
         CodeReader code = new CodeReader(mOntology, "code_ontology.myRDF");
     }

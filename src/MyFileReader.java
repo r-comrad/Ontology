@@ -46,6 +46,18 @@ public class MyFileReader {
         return result;
     }
 
+    public char charRead() {
+        try {
+            int c = mFile.read();
+            if (c == -1) return '$';
+            return (char) c;
+
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return '$';
+    }
+
     public HashSet<String> readAllWords() {
         HashSet<String> result = new HashSet<>();
         int count = Integer.parseInt(read());
