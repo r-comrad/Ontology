@@ -157,7 +157,7 @@ public class ConditionDecoder {
             mConditionTypes.set(conditionNumber, curType + 2);
         }
         String blockName = blockType + "_" + mConditionCounter + "_" + subConditionNumber;
-        mRDFWriter.write(conditionName, blockName, "has_part");
+        mRDFWriter.write(blockName, conditionName, "has_part");
 
         ++subConditionNumber;
         mConditionCounters.set(conditionNumber, subConditionNumber);

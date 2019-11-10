@@ -24,6 +24,8 @@ public class ProgramPanel extends JPanel {
         mOntology.draw(graph, parent);
         mxGraphComponent graphComponent = new mxGraphComponent(graph);
         add(graphComponent);
+
+        mOntology.rdfMaker();
     }
 
     public void codeParser() {

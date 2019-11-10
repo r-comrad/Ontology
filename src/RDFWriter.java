@@ -15,7 +15,7 @@ public class RDFWriter {
     }
 
     public void writeLever(String aObject, Pair<String, String> aParent) {
-        write(aParent.mX, aObject, aParent.mY);
+        write(aObject, aParent.mX, aParent.mY);
     }
 
     public void close()

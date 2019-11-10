@@ -121,7 +121,7 @@ public class VariableDecoder {
         String valueName = "value" + mAssignmentCounter++;
         result.add(valueName);
         //writeLever(valueName);
-        mRDFWriter.write(aList.get(0), valueName, "assignment");
+        mRDFWriter.write(valueName, aList.get(0),"assignment");
         for (int i = 1; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
