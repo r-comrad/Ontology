@@ -35,7 +35,8 @@ public class VariableDecoder {
         //TODO: const types
         if (isBasicTypeSequence(aList.get(0))) result = basicVariableDeclarationDecoder(aList);
         else if(isContainerSequence(aList.get(0))) result = containerDeclarationDecoder(aList);
-        else if(isBasicAssignmentSequence(aList.get(0))) result = basicVariableAssignmentDecoder(aList);
+        else if(aList.size() > 1 && isBasicAssignmentSequence(aList.get(1)))
+            result = basicVariableAssignmentDecoder(aList);
         return result;
     }
 
@@ -80,6 +81,8 @@ public class VariableDecoder {
     }
 
     private void containerPack() {
+        if (mUsedContainers.size() == 0)return;
+
         mRDFWriter.write("container_type", "type", "AKO");
         mRDFWriter.write("container", "variable", "AKO");
 
@@ -115,8 +118,8 @@ public class VariableDecoder {
 
     private List<String> basicVariableAssignmentDecoder(List<String> aList) {
         List <String> result = new ArrayList<>();
-        result.add(aList.get(0));
         String valueName = "value" + mAssignmentCounter++;
+        result.add(valueName);
         //writeLever(valueName);
         mRDFWriter.write(aList.get(0), valueName, "assignment");
         for (int i = 1; i < aList.size(); ++i) {

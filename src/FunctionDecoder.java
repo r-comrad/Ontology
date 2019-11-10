@@ -42,8 +42,8 @@ public class FunctionDecoder {
 
     private void functionPack() {
         mRDFWriter.write("function", "start", "implement");
-        mRDFWriter.write("function", "types", "take");
-        mRDFWriter.write("function", "types", "return");
+        mRDFWriter.write("function", "type", "take");
+        mRDFWriter.write("function", "type", "return");
         mRDFWriter.write("user_function", "function", "AKO");
     }
 
@@ -54,7 +54,7 @@ public class FunctionDecoder {
     private void stdFunctionPack() {
         boolean isAnyStdFunkWrited = false;
 
-        MyFileReader fileReader = new MyFileReader("../res/words", "std_functions.txt");
+        MyFileReader fileReader = new MyFileReader("std_functions.txt");
         int groupsCount = Integer.parseInt(fileReader.read());
 
         for (int i = 0; i < groupsCount; ++i) {

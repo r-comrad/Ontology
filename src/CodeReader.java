@@ -14,7 +14,7 @@ public class CodeReader {
 
     public CodeReader(OntologyTree aOntology) {
         mOntology = aOntology;
-        mReader = new MyFileReader("rdf code");
+        mReader = new MyFileReader("code_ontology.myRDF");
 
         process();
     }

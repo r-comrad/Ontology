@@ -1,11 +1,10 @@
 import java.util.*;
 
-
-enum BlockType {
-    NUN, FUNKTION, VARIABLE, CONDITION;
-}
-
 public class ProgramDecoder {
+    enum BlockType {
+        NUN, FUNKTION, VARIABLE, CONDITION;
+    }
+
     private MyFileReader mFileReader;
     RDFWriter mRDFWriter;
 
@@ -13,14 +12,7 @@ public class ProgramDecoder {
 
     FunctionDecoder mFunctionDecoder;
     VariableDecoder mVariableDecoder;
-
-
-    private int mConditionCounter;
-    private int mConditionPartsCounter;
-    private int mUsedConditions;
-
-    private String lastBlock;
-    private boolean mLastBlockIsCondition;
+    ConditionDecoder mConditionDecoder;
 
     ArrayList<Pair<String, String>> mCodeLevel;
 
@@ -32,48 +24,14 @@ public class ProgramDecoder {
 
         mFunctionDecoder = new FunctionDecoder(mRDFWriter);
         mVariableDecoder = new VariableDecoder(mRDFWriter);
-
-        mConditionCounter = 0;
-        mConditionPartsCounter = 0;
-
-        mUsedConditions = 0;
-
-        lastBlock = "________LB";
-        mLastBlockIsCondition =false;
+        mConditionDecoder = new ConditionDecoder(mRDFWriter);
 
         mCodeLevel = new ArrayList<>();
         mCodeLevel.add(new Pair("start", "implement"));
     }
 
-    private void startPack() {
-    }
-
-    private void writeLever(String str) {
-        //mFileWriter.write(pack(mCodeLevel.get(mCodeLevel.size() - 1).mX, str,
-        //        mCodeLevel.get(mCodeLevel.size() - 1).mY));
-       //         mFileWriter.write(pack(str, mCodeLevel.get(mCodeLevel.size() - 1).mX,
-          //      mCodeLevel.get(mCodeLevel.size() - 1).mY));
-    }
-
-
-    private void inputStreamPack() {
-        //mFileWriter.write(pack("data_stream", "start", "implement"));
-        //mFileWriter.write(pack("cin", "data_stream", "ISA"));
-        //mFileWriter.write(pack("cout", "data_stream", "ISA"));
-    }
-
-    private void conditionPack() {
-        //mFileWriter.write(pack("conditions_types", "start", "implement"));
-        //if ((mUsedConditions & 1) != 0) mFileWriter.write(pack("if", "conditions_types", "AKO"));
-        //if ((mUsedConditions & 2) != 0) mFileWriter.write(pack("if-else", "conditions_types", "AKO"));
-        //if ((mUsedConditions & 4) != 0) mFileWriter.write(pack("if-else_tree", "conditions_types", "AKO"));
-    }
-
     public void process() {
         List<String> list = new ArrayList();
-        int type = 0;
-        boolean streamUsed = false;
-
         String str;
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
@@ -86,15 +44,40 @@ public class ProgramDecoder {
                     mVariableDecoder.infunctionDeclarationDecoder(list);
                     connections = mFunctionDecoder.process(list);
                 }
-
-                if (isLevelIncreaser(str)) {
-                    String lastBlockLabel = connections.get(0);
-                    mCodeLevel.add(new Pair(lastBlockLabel, "has_part"));
+                else if(mType == BlockType.CONDITION)
+                {
+                    connections = mConditionDecoder.process(list);
                 }
 
-                for(String i : connections)
+                if(mType == BlockType.CONDITION)
                 {
-                    mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
+                    String curStr = connections.get(0);
+                    if (curStr.startsWith("condition"))
+                    {
+                        mRDFWriter.writeLever(curStr, mCodeLevel.get(mCodeLevel.size() - 1));
+                        connections.remove(0);
+                    }
+                }
+                else {
+                    for(String i : connections)
+                    {
+                        mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
+                    }
+                }
+
+
+                if (isLevelIncreaser(str)) {
+                    if (connections.size() > 0)
+                    {
+                        String lastBlockLabel = connections.get(0);
+                        mCodeLevel.add(new Pair(lastBlockLabel, "has_part"));
+                    }
+                    mConditionDecoder.increaseLevel();
+                }
+                else if(isLevelDecreaser(str))
+                {
+                    mConditionDecoder.decreaseLevel();
+                    mCodeLevel.remove(mCodeLevel.size() - 1);
                 }
 
                 list.clear();
@@ -104,11 +87,27 @@ public class ProgramDecoder {
                     mType = BlockType.VARIABLE;
                 }
                 else if (mFunctionDecoder.isFunctionalSequence(str)) {
-                    mType = BlockType.FUNKTION;
+                    if (mType != BlockType.CONDITION) mType = BlockType.FUNKTION;
+                }
+                else if(mConditionDecoder.isConditionSequence(str))
+                {
+                    mType = BlockType.CONDITION;
+                }
+                else if(isLevelIncreaser(str))
+                {
+                    //mConditionDecoder.increaseLevel();
+                }
+                else if(isLevelDecreaser(str))
+                {
+                    //mConditionDecoder.decreaseLevel();
                 }
                 if (!isUnusedSequence(str)) list.add(str);
             }
         }
+
+        mFunctionDecoder.writePack();
+        mVariableDecoder.writePack();
+        mConditionDecoder.writePack();
 
         mRDFWriter.close();
     }
@@ -144,60 +143,9 @@ public class ProgramDecoder {
 
     public boolean isUnusedSequence(String s) {
         return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")") ||
-                Objects.equals(s, "=") || Objects.equals(s, "+") || Objects.equals(s, ">") ||
+                /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") || Objects.equals(s, ">") ||
                 Objects.equals(s, "<") || Objects.equals(s, "&&") || Objects.equals(s, "||") ||
                 Objects.equals(s, "!=") || Objects.equals(s, "==");
-    }
-
-    public void conditionClouser() {
-        if(mConditionPartsCounter == 0) return;
-
-        String conditionName = "condition" + mConditionCounter;
-        String parent = "________pr";
-        if (mConditionPartsCounter == 1) {
-            parent = "if";
-            mUsedConditions |= 1;
-        } else if (mConditionPartsCounter == 2) {
-            parent = "if-else";
-            mUsedConditions |= 2;
-        } else if (mConditionPartsCounter > 2) {
-            parent = "if-else_tree";
-            mUsedConditions |= 4;
-        }
-        writeLever(conditionName);
-        //mFileWriter.write(pack(conditionName, parent, "ISA"));
-    }
-
-    public void conditionDecoder(List<String> aList) {
-        // TODO: if else if (2 условия)
-
-        if (isIfSequence(aList.get(0))) {
-            conditionClouser();
-            ++mConditionCounter;
-            mConditionPartsCounter = 0;
-        }
-        String conditionName = "condition" + mConditionCounter;
-
-        int offset = 0;
-        String blockName = "________bn";
-        if (isIfSequence(aList.get(0))) {
-            blockName = "if" + "_" + mConditionCounter + "_" + mConditionPartsCounter++;
-        } else if (aList.size() > 1 && isElseIfSequence(aList.get(0), aList.get(1))) {
-            blockName = "else-if_block" +"_" +  mConditionCounter + "_" + mConditionPartsCounter++;
-            ++offset;
-        } else if (isElseSequence(aList.get(0))) {
-            blockName = "else_block" + "_" + mConditionCounter + "_" + mConditionPartsCounter++;
-        }
-        //lastBlockLabel = blockName;
-        mLastBlockIsCondition = true;
-
-       // mFileWriter.write(pack(conditionName, blockName, "has_part"));
-
-        for (int i = 1 + offset; i < aList.size(); ++i) {
-          //  if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
-          //          aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
-         //       mFileWriter.write(pack(blockName, aList.get(i), "take"));
-        }
     }
 
     public void streamDecoder(List<String> aList) {

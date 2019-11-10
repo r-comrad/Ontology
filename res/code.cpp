@@ -1,23 +1,13 @@
 int main ( )
 {
-	int a , b ;
-	a = 65 ;
-	b = 44 ;
-	if ( a > b ) 
+	int a ;
+	double b ;
+	if ( a > 5 )
 	{
-		a = sqrt ( a ) ;
+		a = 6 ;
 	}
-	else if ( a < b )
+	else 
 	{
-		a = b + 2 ;
-	}
-	else if ( a > 4 ) 
-	{
-		a = a - 6 ;
-	}
-	else
-	{
-		b = 0 ;
+		b = 6 ;
 	}
 }
-

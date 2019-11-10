@@ -5,17 +5,17 @@ import com.mxgraph.view.mxGraph;
 
 public class ProgramPanel extends JPanel {
     private OntologyTree mOntology;
-    private CommandTreeNode mCommandTree;
+    //private CommandTreeNode mCommandTree;
 
     public ProgramPanel() {
         ProgramDecoder programDecoder = new ProgramDecoder();
         programDecoder.process();
 
         mOntology = new OntologyTree();
-        mCommandTree = new CommandTreeNode();
+        //mCommandTree = new CommandTreeNode();
 
         //ontologyReader();
-        commandTreeReader();
+        //commandTreeReader();
         codeParser();
 
         mxGraph graph = new mxGraph();
@@ -39,7 +39,7 @@ public class ProgramPanel extends JPanel {
             }
         }*/
 
-        CodeReader code = new CodeReader(mOntology, "rdf code");
+        CodeReader code = new CodeReader(mOntology, "code_ontology.myRDF");
     }
 
     /*public void ontologyReader() {
@@ -60,7 +60,7 @@ public class ProgramPanel extends JPanel {
         }
     }*/
 
-    public void commandTreeReader() {
+    /*public void commandTreeReader() {
         MyFileReader fileReader = new MyFileReader("commands list.txt");
         int count = Integer.parseInt(fileReader.read());
         for (int i = 0; i < count; ++i) {
@@ -68,5 +68,5 @@ public class ProgramPanel extends JPanel {
             String parent = fileReader.read();
             mCommandTree.add(command, parent);
         }
-    }
+    }*/
 }

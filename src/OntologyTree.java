@@ -78,9 +78,9 @@ public class OntologyTree {
     public void draw(mxGraph aGraph, Object aParent) {
         Map<String, Object> drawedVertex = new HashMap<>();
 
-        int size = 6;
+        int size = 7;
         int i = 0, j = 0;
-        int x = 100, y = 250;
+        int x = 150, y = 300;
         //for(int i = 0; i < mTree.size() / size; ++i)
         for (Map.Entry<String, Set<Pair<String, String>>> entry : mTree.entrySet()) {
             //for(int j = 0; j < size; ++j)
@@ -122,6 +122,11 @@ public class OntologyTree {
                 }
             }
         }
+    }
+
+    public void rdfMaker()
+    {
+
     }
 /*
     public void draw(mxGraph aGraph, Object aParent, double aX, double aY) {

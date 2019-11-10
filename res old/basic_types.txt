@@ -1,0 +1,7 @@
+6
+void basic_types ISA
+int basic_types ISA
+float basic_types ISA
+double basic_types ISA
+bool basic_types ISA
+char basic_types ISA

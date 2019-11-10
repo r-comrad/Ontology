@@ -1,0 +1,15 @@
+name;ISA;AKO;has_part;has_type;assignment;read;write;stores;use;take;return;implement;
+start;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;
+types;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
+function;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;types;start;
+variable;nun;nun;nun;types;nun;nun;nun;nun;nun;nun;nun;start;
+main;user_functions;function;nun;nun;nun;nun;nun;nun;nun;nun;int;start;
+basic_types;nun;types;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
+container_types;nun;types;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
+user_functions;nun;function;nun;nun;nun;nun;nun;nun;nun;nun;types;start;
+container;nun;variable;nun;types;nun;nun;nun;nun;nun;nun;nun;start;
+basic_variable;nun;variable;nun;types;nun;nun;nun;nun;nun;nun;nun;start;
+a;container;variable;nun;vector;nun;nun;nun;int;nun;nun;nun;start;
+b;basic_variable;variable;nun;int;nun;nun;nun;nun;nun;nun;nun;start;
+int;basic_types;types;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
+vector;container_types;types;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
