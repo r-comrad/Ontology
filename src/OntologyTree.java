@@ -5,12 +5,9 @@ import java.util.*;
 public class OntologyTree {
     private Map<String, Set<Pair<String, String>>> mTree; // Node Name - Connection Name
 
-    private static String getItself(String itself, String dummy)
-    {
+    private static String getItself(String itself, String dummy) {
         return itself;
     }
-//swapStrings(int String
-
 
     public OntologyTree() {
         mTree = new LinkedHashMap<>();
@@ -21,8 +18,8 @@ public class OntologyTree {
         if (!mTree.containsKey(aFromNodeName)) mTree.put(aFromNodeName, new LinkedHashSet<>());
         if (!mTree.containsKey(aToNodeName)) mTree.put(aToNodeName, new LinkedHashSet<>());
 
-        Set <Pair<String, String>> nodeFrom = mTree.get(aFromNodeName);
-        Set <Pair<String, String>> nodeTo = mTree.get(aToNodeName);
+        Set<Pair<String, String>> nodeFrom = mTree.get(aFromNodeName);
+        Set<Pair<String, String>> nodeTo = mTree.get(aToNodeName);
 
         nodeFrom.add(new Pair(aToNodeName, aConnectionName));
         nodeTo.add(new Pair(aFromNodeName, "-" + aConnectionName));
@@ -42,8 +39,7 @@ public class OntologyTree {
             drawedVertex.put(nodeName, vertex);
 
             ++i;
-            if (i >= size)
-            {
+            if (i >= size) {
                 i = 0;
                 ++j;
             }
@@ -58,7 +54,7 @@ public class OntologyTree {
             painted.add(nodeName);
 
             Set<Pair<String, String>> currentNode = mTree.get(nodeName);
-            for(Pair<String, String> p : currentNode) {
+            for (Pair<String, String> p : currentNode) {
                 String neighborNodeName = p.getFirst();
                 String connectionName = p.getSecond();
 
@@ -92,16 +88,7 @@ public class OntologyTree {
         list.add("return");
         list.add("implement");
 
-        //Set<String> nodes = new HashSet<>();
         List<String> nodes = new ArrayList();
-
-        /*Map<String, String> start = new LinkedHashMap<>();
-        for(String i : list)
-        {
-            start.put(i, "nun");
-        }
-        table.put("start", start);*/
-
 
         Queue<String> nodeQueue = new LinkedList<>();
         nodeQueue.offer("start");
@@ -125,88 +112,66 @@ public class OntologyTree {
                 }
             }
         }
-        for(int k = 0; k < 2; ++k){
-        nodeQueue = new LinkedList<>();
-        nodeQueue.offer("start");
-        painted = new HashSet<>();
-        while (!nodeQueue.isEmpty()) {
-            String nodeName = nodeQueue.remove();
-            //if (painted.contains(nodeName)) continue;
-            painted.add(nodeName);
+        for (int k = 0; k < 2; ++k) {
+            nodeQueue = new LinkedList<>();
+            nodeQueue.offer("start");
+            painted = new HashSet<>();
+            while (!nodeQueue.isEmpty()) {
+                String nodeName = nodeQueue.remove();
+                painted.add(nodeName);
 
-            for (Pair<String, String> i : mTree.get(nodeName)) {
-                String obj = i.getFirst(), subj = nodeName, pred = i.getSecond();
-                if (!painted.contains(obj)) {
-                    nodeQueue.offer(obj);
-                }
-
-                if (!pred.startsWith("-")) {
-                    //subj = getItself(obj, obj = subj);
-                    continue;
-                } else pred = pred.substring(1);
-
-                Map<String, String> new_val = table.get(obj), parent = table.get(subj);
-                if (new_val == null) {
-                    if (parent == null) new_val = new LinkedHashMap<>(table.get("start"));
-                    else new_val = new LinkedHashMap<>(parent);
-                } else {
-                    int num = list.indexOf(pred);
-
-                    for (int j = num + 1; j < list.size(); ++j) {
-                        String conName = list.get(j);
-                        if (!Objects.equals(parent.get(conName), "nun") &&
-                                Objects.equals(new_val.get(conName), "nun"))
-                            new_val.put(conName, parent.get(conName));
+                for (Pair<String, String> i : mTree.get(nodeName)) {
+                    String obj = i.getFirst(), subj = nodeName, pred = i.getSecond();
+                    if (!painted.contains(obj)) {
+                        nodeQueue.offer(obj);
                     }
+
+                    if (!pred.startsWith("-")) {
+                        continue;
+                    } else pred = pred.substring(1);
+
+                    Map<String, String> new_val = table.get(obj), parent = table.get(subj);
+                    if (new_val == null) {
+                        if (parent == null) new_val = new LinkedHashMap<>(table.get("start"));
+                        else new_val = new LinkedHashMap<>(parent);
+                    } else {
+                        int num = list.indexOf(pred);
+
+                        for (int j = num + 1; j < list.size(); ++j) {
+                            String conName = list.get(j);
+                            if (!Objects.equals(parent.get(conName), "nun") &&
+                                    Objects.equals(new_val.get(conName), "nun"))
+                                new_val.put(conName, parent.get(conName));
+                        }
+                    }
+                    new_val.put(pred, subj);
+                    table.put(obj, new_val);
                 }
-                new_val.put(pred, subj);
-                table.put(obj, new_val);
             }
         }
-    }
 
         MyFileWriter ans = new MyFileWriter("ans.txt");
 
         for (String i : nodes) {
-            ans.write(i + ";" );
+            ans.write(i + ";");
         }
-        ans.write("\n\n" );
+        ans.write("\n\n");
 
-        ans.write("name;" );
-        /*for (Map.Entry<String, String> j : table.get("start").entrySet()) {
-            ans.write(j.getKey() + ";" );
-        }*/
+        ans.write("name;");
+
         for (String i : list) {
-            ans.write(i + ";" );
+            ans.write(i + ";");
         }
-        ans.write("\n" );
+        ans.write("\n");
 
         for (String i : nodes) {
-        //for (String i : table.keySet()) {
-        //for (Map.Entry<String, Map<String, String>> i : table.entrySet()) {
-            //ans.write(i.getKey() + ";" );
-            ans.write(i + ";" );
+            ans.write(i + ";");
             for (String j : list) {
                 //String curVal = i.getValue().get(j);
                 String curVal = table.get(i).get(j);
-                ans.write(curVal + ";" );
+                ans.write(curVal + ";");
             }
-            /*for (Map.Entry<String, String> j : i.getValue().entrySet()) {
-                if (Objects.equals(j.getValue(), "type"))
-                {
-                    ans.write("type" + ";" );
-                }
-                else ans.write(j.getValue() + ";" );
-                if (Objects.equals(i.getKey(), "function") && Objects.equals(j.getKey(), "return"))
-                {
-                    if (Objects.equals(j.getValue(), "type"))
-                    {
-                        //ans.write("bleat1" );
-                    }
-                    else ;//ans.write("bleat2" );
-                }
-            }*/
-            ans.write("\n" );
+            ans.write("\n");
         }
         ans.close();
     }

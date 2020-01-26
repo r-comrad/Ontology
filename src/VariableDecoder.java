@@ -14,8 +14,7 @@ public class VariableDecoder extends Decoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public VariableDecoder(RDFWriter aRDFWriter)
-    {
+    public VariableDecoder(RDFWriter aRDFWriter) {
         mRDFWriter = aRDFWriter;
         mAssignmentCounter = 0;
 
@@ -30,13 +29,12 @@ public class VariableDecoder extends Decoder {
     }
 
     @Override
-    public List<String> process(List<String> aList)
-    {
-        List <String> result = new ArrayList<>();
+    public List<String> process(List<String> aList) {
+        List<String> result = new ArrayList<>();
         //TODO: const types
         if (isBasicTypeSequence(aList.get(0))) result = basicVariableDeclarationDecoder(aList);
-        else if(isContainerSequence(aList.get(0))) result = containerDeclarationDecoder(aList);
-        else if(aList.size() > 1 && isBasicAssignmentSequence(aList.get(1)))
+        else if (isContainerSequence(aList.get(0))) result = containerDeclarationDecoder(aList);
+        else if (aList.size() > 1 && isBasicAssignmentSequence(aList.get(1)))
             result = basicVariableAssignmentDecoder(aList);
         return result;
     }
@@ -65,13 +63,14 @@ public class VariableDecoder extends Decoder {
     }
 
     @Override
-    public Type getType(){ return Type.VARIABLE; }
+    public Type getType() {
+        return Type.VARIABLE;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
-    public void writePack()
-    {
+    public void writePack() {
         variablePack();
         containerPack();
         basicVariablePack();
@@ -87,23 +86,20 @@ public class VariableDecoder extends Decoder {
     }
 
     private void containerPack() {
-        if (mUsedContainers.size() == 0)return;
+        if (mUsedContainers.size() == 0) return;
 
         mRDFWriter.write("container_type", "type", "AKO");
         mRDFWriter.write("container", "variable", "AKO");
 
         Iterator<String> i = mUsedContainers.iterator();
-        while (i.hasNext())
-        {
+        while (i.hasNext()) {
             mRDFWriter.write(i.next(), "container_type", "ISA");
         }
     }
 
     private void basicVariablePack() {
         mRDFWriter.write("basic_variable", "variable", "AKO");
-        for(String i : mUsedBasicTypes)
-        {
-            //if (mUsedTypes.contains(parent))
+        for (String i : mUsedBasicTypes) {
             mRDFWriter.write(i, "basic_type", "ISA");
         }
     }
@@ -111,10 +107,9 @@ public class VariableDecoder extends Decoder {
     //------------------------------------------------------------------------------------------------------------------
 
     private List<String> basicVariableDeclarationDecoder(List<String> aList) {
-        List <String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         mUsedBasicTypes.add(aList.get(0));
         for (int i = 1; i < aList.size(); ++i) {
-            //writeLever(aList.get(i));
             mRDFWriter.write(aList.get(i), aList.get(0), "has_type");
             mRDFWriter.write(aList.get(i), "basic_variable", "ISA");
             result.add(aList.get(i));
@@ -123,11 +118,10 @@ public class VariableDecoder extends Decoder {
     }
 
     private List<String> basicVariableAssignmentDecoder(List<String> aList) {
-        List <String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         String valueName = "value" + mAssignmentCounter++;
         result.add(valueName);
-        //writeLever(valueName);
-        mRDFWriter.write(valueName, aList.get(0),"assignment");
+        mRDFWriter.write(valueName, aList.get(0), "assignment");
         for (int i = 1; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
@@ -140,11 +134,10 @@ public class VariableDecoder extends Decoder {
     //------------------------------------------------------------------------------------------------------------------
 
     // TODO: ofset for map
-    private List <String> containerDeclarationDecoder(List<String> aList) {
-        List <String> result = new ArrayList<>();
+    private List<String> containerDeclarationDecoder(List<String> aList) {
+        List<String> result = new ArrayList<>();
         mUsedContainers.add(aList.get(0));
         for (int i = 2; i < aList.size(); ++i) {
-            //writeLever(aList.get(i));
             result.add(aList.get(i));
             mRDFWriter.write(aList.get(i), aList.get(0), "has_type");
             mRDFWriter.write(aList.get(i), aList.get(1), "stores");
@@ -153,30 +146,21 @@ public class VariableDecoder extends Decoder {
         return result;
     }
 
-    private void containerAssignmentDecoder(List<String> aList) {}
-
     //------------------------------------------------------------------------------------------------------------------
 
     public void infunctionDeclarationDecoder(List<String> aList) {
-        if (isContainerSequence(aList.get(0)))
-        {
+        if (isContainerSequence(aList.get(0))) {
             aList.remove(2);
             // TODO: ofset for map
         }
 
         for (int i = 2; i < aList.size(); ++i) {
             String curStr = aList.get(i);
-            if (isBasicTypeSequence(curStr))
-            {
-                //List<String> basicVariables = new ArrayList<>();
-                //basicVariables.add(aList.get(i));
-                //basicVariables.add(aList.get(i + 1));
+            if (isBasicTypeSequence(curStr)) {
                 basicVariableDeclarationDecoder(aList.subList(i, i + 1));
                 aList.remove(i);
                 i++;
-            }
-            else if(isContainerSequence(curStr))
-            {
+            } else if (isContainerSequence(curStr)) {
                 containerDeclarationDecoder(aList.subList(i, i + 2));
                 aList.remove(i);
                 aList.remove(i);

@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,9 +13,6 @@ public class ConditionDecoder extends Decoder {
     private int mUsedConditions;
     // TODO: List<String> mConditionCounters;
 
-    //private String lastBlock;
-    //private boolean mLastBlockIsCondition;
-
     public ConditionDecoder(RDFWriter aRDFWriter) {
         mRDFWriter = aRDFWriter;
 
@@ -26,14 +22,6 @@ public class ConditionDecoder extends Decoder {
         mConditionCounters = new ArrayList<>();
 
         mUsedConditions = 0;
-    }
-
-    public void increaseLevel() {
-        conditionAdder();
-    }
-
-    public void decreaseLevel() {
-        conditionCloser();
     }
 
     @Override
@@ -106,8 +94,6 @@ public class ConditionDecoder extends Decoder {
         List<String> result = new ArrayList<>();
         String conditionName = "condition" + "_" + ++mConditionCounter;
 
-        //int conditionNumber = mConditionNames.size() - 1;
-        //mConditionNames.set(conditionNumber, conditionName);
         mConditionNames.add(conditionName);
         mConditionTypes.add(0);
         mConditionCounters.add(0);
@@ -130,7 +116,6 @@ public class ConditionDecoder extends Decoder {
             } else if (conditionType == 1) {
                 parent = "if";
                 mUsedConditions |= 1;
-                //mConditionTypes.set(conditionNumber, 1);
             } else if (conditionType == 3) {
                 parent = "if-else";
                 mUsedConditions |= 2;
@@ -147,7 +132,6 @@ public class ConditionDecoder extends Decoder {
         // TODO: if else if (2 условия)
         //TODO: funktion call inside condition
         int conditionNumber = mConditionNames.size() - 1;
-        String conditionName = mConditionNames.get(conditionNumber);
         int subConditionNumber = mConditionCounters.get(conditionNumber);
 
         String blockType = "________BT";
@@ -164,7 +148,6 @@ public class ConditionDecoder extends Decoder {
             mConditionTypes.set(conditionNumber, curType + 2);
         }
         String blockName = blockType + "_" + mConditionCounter + "_" + subConditionNumber;
-        //mRDFWriter.write(blockName, conditionName, "has_part");
 
         ++subConditionNumber;
         mConditionCounters.set(conditionNumber, subConditionNumber);

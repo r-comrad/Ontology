@@ -8,26 +8,22 @@ public class FunctionDecoder extends Decoder {
 
     //TODO: function call without asignment
 
-    public FunctionDecoder(RDFWriter aRDFWriter, VariableDecoder aVariableDecoder)
-    {
+    public FunctionDecoder(RDFWriter aRDFWriter, VariableDecoder aVariableDecoder) {
         mRDFWriter = aRDFWriter;
-        mUsedFunctions= new HashSet<>();
+        mUsedFunctions = new HashSet<>();
         mVariableDecoder = aVariableDecoder;
     }
 
     @Override
-    public List<String> process(List<String> aList)
-    {
+    public List<String> process(List<String> aList) {
         mVariableDecoder.infunctionDeclarationDecoder(aList);
 
         List<String> result = new ArrayList<>();
-        if (aList.size() > 1)
-        {
+        if (aList.size() > 1) {
             functionDecoder(aList);
             result.add(aList.get(1));
         }
-        //else stdFunctionPack();
-        //mRDFWriter.writeLever(result, aParent);
+
         return result;
     }
 
@@ -39,13 +35,14 @@ public class FunctionDecoder extends Decoder {
     }
 
     @Override
-    public Type getType(){ return Type.FUNKTION; }
+    public Type getType() {
+        return Type.FUNKTION;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
-    public void writePack()
-    {
+    public void writePack() {
         functionPack();
         userFunctionPack();
         stdFunctionPack();
@@ -55,7 +52,6 @@ public class FunctionDecoder extends Decoder {
         mRDFWriter.write("function", "start", "implement");
         mRDFWriter.write("function", "type", "take");
         mRDFWriter.write("function", "type", "return");
-        //mRDFWriter.write("user_function", "function", "AKO");
     }
 
     private void userFunctionPack() {
@@ -95,9 +91,6 @@ public class FunctionDecoder extends Decoder {
     //------------------------------------------------------------------------------------------------------------------
 
     private void functionDecoder(List<String> aList) {
-        //lastBlockLabel = aList.get(1);
-        //writeLever(aList.get(1));
-
         mRDFWriter.write(aList.get(1), aList.get(0), "return");
         mRDFWriter.write(aList.get(1), "user_function", "ISA");
         for (int i = 2; i < aList.size(); ++i) {

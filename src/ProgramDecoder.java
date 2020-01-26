@@ -23,18 +23,15 @@ public class ProgramDecoder {
         mDecoders.add(new ConditionDecoder(mRDFWriter));
 
         mCodeLevel = new ArrayList<>();
-        //mCodeLevel.add(new Pair("start", "implement"));
     }
 
     public void process() {
         List<String> list = new ArrayList();
         String str;
-        Decoder.Type prevType =  Decoder.Type.NUN;
+        Decoder.Type prevType = Decoder.Type.NUN;
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
                 List<String> connections = new ArrayList<>();
-                /*for(Decoder i : mDecoders)
-                    if (i.checkSequence(str)) mType = i.getType();*/
 
                 for (Decoder i : mDecoders)
                     if (mType == i.getType()) {
@@ -43,8 +40,6 @@ public class ProgramDecoder {
                     }
                 {
                     for (String i : connections) {
-                        //if (mCodeLevel.size() > 0 && connections.size() > 0)
-
                         if (mCodeLevel.size() > 0) {
                             mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
                         }
@@ -59,8 +54,7 @@ public class ProgramDecoder {
                     mCodeLevel.remove(mCodeLevel.size() - 1);
                 }
 
-                if (prevType == Decoder.Type.NUN && mType != Decoder.Type.CONDITION)
-                {
+                if (prevType == Decoder.Type.NUN && mType != Decoder.Type.CONDITION) {
                     for (Decoder i : mDecoders)
                         if (Decoder.Type.CONDITION == i.getType()) {
                             i.close();
@@ -71,35 +65,16 @@ public class ProgramDecoder {
                 list.clear();
                 mType = Decoder.Type.NUN;
             } else {
-                //if ( mType == Decoder.Type.NUN)
                 {
-                    for(Decoder i : mDecoders)
+                    for (Decoder i : mDecoders)
                         if (i.checkSequence(str)) mType = i.getType();
                 }
 
-                /*if (mVariableDecoder.isVariableSequence(str)) {
-                    mType = BlockType.VARIABLE;
-                }
-                else if (mFunctionDecoder.isFunctionalSequence(str)) {
-                    if (mType != BlockType.CONDITION) mType = BlockType.FUNKTION;
-                }
-                else if(mConditionDecoder.isConditionSequence(str))
-                {
-                    mType = BlockType.CONDITION;
-                }
-                else*/ if(isLevelIncreaser(str))
-                {
-                    //mConditionDecoder.increaseLevel();
-                }
-                else if(isLevelDecreaser(str))
-                {
-                    //mConditionDecoder.decreaseLevel();
-                }
                 if (!isUnusedSequence(str)) list.add(str);
             }
         }
 
-        for(Decoder i : mDecoders) i.writePack();
+        for (Decoder i : mDecoders) i.writePack();
 
         mRDFWriter.close();
     }
@@ -121,37 +96,10 @@ public class ProgramDecoder {
         return Objects.equals(str, ";") || Objects.equals(str, "{") || Objects.equals(str, "}");
     }
 
-    public boolean isIfSequence(String s) {
-        return Objects.equals(s, "if");
-    }
-
-    public boolean isElseSequence(String s) {
-        return Objects.equals(s, "else");
-    }
-
-    public boolean isElseIfSequence(String s1, String s2) {
-        return Objects.equals(s1, "else") && Objects.equals(s2, "if");
-    }
-
     public boolean isUnusedSequence(String s) {
         return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")") ||
                 /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") || Objects.equals(s, ">") ||
                 Objects.equals(s, "<") || Objects.equals(s, "&&") || Objects.equals(s, "||") ||
                 Objects.equals(s, "!=") || Objects.equals(s, "==");
     }
-
-    public void streamDecoder(List<String> aList) {
-        //writeLever(aList.get(0));
-        //mFileWriter.write(pack(aList.get(0), "data_stream", "ISA"));
-        for (int i = 2; i < aList.size(); i += 2) {
-       //     String valueName = "value" + mAssignmentCounter++;
-          //  writeLever(valueName);
-        //    mFileWriter.write(pack(aList.get(i), valueName, "assignment"));
-        //    mFileWriter.write(pack(aList.get(0), valueName, "read"));
-        }
-    }
-
-
-
-
 }

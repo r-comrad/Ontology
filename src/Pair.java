@@ -2,11 +2,6 @@ public class Pair<T1, T2> {
     public T1 mX;
     public T2 mY;
 
-    /*public Pair() {
-        mX = 0;
-        mY = 0;
-    }*/
-
     public Pair(T1 aX, T2 aY) {
         mX = aX;
         mY = aY;
