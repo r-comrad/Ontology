@@ -1,18 +1,12 @@
 import java.util.*;
 
 public class ProgramDecoder {
-    enum BlockType {
-        NUN, FUNKTION, VARIABLE, CONDITION;
-    }
-
     private MyFileReader mFileReader;
     RDFWriter mRDFWriter;
 
-    BlockType mType;
+    Decoder.Type mType;
 
-    FunctionDecoder mFunctionDecoder;
-    VariableDecoder mVariableDecoder;
-    ConditionDecoder mConditionDecoder;
+    List<Decoder> mDecoders;
 
     ArrayList<Pair<String, String>> mCodeLevel;
 
@@ -20,11 +14,13 @@ public class ProgramDecoder {
         mFileReader = new MyFileReader("parsed_code.cpp");
         mRDFWriter = new RDFWriter();
 
-        mType = BlockType.NUN;
+        mType = Decoder.Type.NUN;
 
-        mFunctionDecoder = new FunctionDecoder(mRDFWriter);
-        mVariableDecoder = new VariableDecoder(mRDFWriter);
-        mConditionDecoder = new ConditionDecoder(mRDFWriter);
+        VariableDecoder temp = new VariableDecoder(mRDFWriter);
+        mDecoders = new ArrayList();
+        mDecoders.add(temp);
+        mDecoders.add(new FunctionDecoder(mRDFWriter, temp));
+        mDecoders.add(new ConditionDecoder(mRDFWriter));
 
         mCodeLevel = new ArrayList<>();
         //mCodeLevel.add(new Pair("start", "implement"));
@@ -36,7 +32,15 @@ public class ProgramDecoder {
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
                 List<String> connections = new ArrayList<>();
-                if (mType == BlockType.VARIABLE)
+                /*for(Decoder i : mDecoders)
+                    if (i.checkSequence(str)) mType = i.getType();*/
+
+                for(Decoder i : mDecoders)
+                    if (mType == i.getType())
+                    {
+                        connections = i.process(list);
+                    }
+                /*if (mType == BlockType.VARIABLE)
                 {
                     connections = mVariableDecoder.process(list);
                 }
@@ -47,9 +51,9 @@ public class ProgramDecoder {
                 else if(mType == BlockType.CONDITION)
                 {
                     connections = mConditionDecoder.process(list);
-                }
+                }*/
 
-                if(mType == BlockType.CONDITION)
+                /*if(mType == BlockType.CONDITION)
                 {
                     String curStr = connections.get(0);
                     if (curStr.startsWith("condition"))
@@ -58,7 +62,7 @@ public class ProgramDecoder {
                         connections.remove(0);
                     }
                 }
-                else {
+                else*/ {
                     for(String i : connections)
                     {
                         if (mCodeLevel.size() > 0) mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
@@ -72,18 +76,24 @@ public class ProgramDecoder {
                         String lastBlockLabel = connections.get(0);
                         mCodeLevel.add(new Pair(lastBlockLabel, "has_part"));
                     }
-                    mConditionDecoder.increaseLevel();
+                    //mConditionDecoder.increaseLevel();
                 }
                 else if(isLevelDecreaser(str))
                 {
-                    mConditionDecoder.decreaseLevel();
+                    //mConditionDecoder.decreaseLevel();
                     mCodeLevel.remove(mCodeLevel.size() - 1);
                 }
 
                 list.clear();
-                mType = BlockType.NUN;
+                mType = Decoder.Type.NUN;
             } else {
-                if (mVariableDecoder.isVariableSequence(str)) {
+                //if ( mType == Decoder.Type.NUN)
+                {
+                    for(Decoder i : mDecoders)
+                        if (i.checkSequence(str)) mType = i.getType();
+                }
+
+                /*if (mVariableDecoder.isVariableSequence(str)) {
                     mType = BlockType.VARIABLE;
                 }
                 else if (mFunctionDecoder.isFunctionalSequence(str)) {
@@ -93,7 +103,7 @@ public class ProgramDecoder {
                 {
                     mType = BlockType.CONDITION;
                 }
-                else if(isLevelIncreaser(str))
+                else*/ if(isLevelIncreaser(str))
                 {
                     //mConditionDecoder.increaseLevel();
                 }
@@ -105,9 +115,7 @@ public class ProgramDecoder {
             }
         }
 
-        mFunctionDecoder.writePack();
-        mVariableDecoder.writePack();
-        mConditionDecoder.writePack();
+        for(Decoder i : mDecoders) i.writePack();
 
         mRDFWriter.close();
     }

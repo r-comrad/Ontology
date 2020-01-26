@@ -19,7 +19,7 @@ public class MyFileWriter {
 
         try {
             mFile = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream("D:/projects/Java/Ontology/res/" + aFileName), StandardCharsets.UTF_8));
+                    new FileOutputStream("E:/projects/Java/Ontology/res/" + aFileName), StandardCharsets.UTF_8));
 
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -29,6 +29,7 @@ public class MyFileWriter {
     public void write(String result) {
         try {
             mFile.write(result);
+            //System.out.println(result);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }

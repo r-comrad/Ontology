@@ -4,7 +4,7 @@ int main()
 	a = 0;
 	double b;
 	b = 1;
-	if (a > 5)
+	if a > 5
 	{
 		a = 6 ;
 	}

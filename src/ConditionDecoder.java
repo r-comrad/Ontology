@@ -3,7 +3,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-public class ConditionDecoder {
+public class ConditionDecoder extends Decoder {
     private RDFWriter mRDFWriter;
 
     private int mConditionCounter;
@@ -34,6 +34,7 @@ public class ConditionDecoder {
        conditionCloser();
     }
 
+    @Override
     public List<String> process(List<String> aList) {
         List<String> result = new ArrayList<>();
         new ArrayList<>();
@@ -52,7 +53,8 @@ public class ConditionDecoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public boolean isConditionSequence(String aStr) {
+    @Override
+    public boolean checkSequence(String aStr) {
 
         return isIfSequence(aStr) || isElseSequence(aStr);
     }
@@ -69,8 +71,12 @@ public class ConditionDecoder {
         return Objects.equals(aStr1, "else") && Objects.equals(aStr2, "if");
     }
 
+    @Override
+    public Type getType(){ return Type.CONDITION; }
+
     //------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public void writePack()
     {
         if (mConditionCounter > 0)
@@ -98,9 +104,11 @@ public class ConditionDecoder {
         List<String> result = new ArrayList<>();
         String conditionName = "condition" + "_" + ++mConditionCounter;
 
-        int conditionNumber = mConditionNames.size() - 1;
-        mConditionNames.set(conditionNumber, conditionName);
-        mConditionTypes.set(conditionNumber, 0);
+        //int conditionNumber = mConditionNames.size() - 1;
+        //mConditionNames.set(conditionNumber, conditionName);
+        mConditionNames.add(conditionName);
+        mConditionTypes.add(0);
+        mConditionCounters.add(0);
 
         result.add(conditionName);
         return result;

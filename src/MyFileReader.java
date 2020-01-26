@@ -24,7 +24,7 @@ public class MyFileReader {
     public MyFileReader(String aFileName) {
         try {
             mFile = new BufferedReader(new InputStreamReader(
-                    new FileInputStream("D:/projects/Java/Ontology/res/" + aFileName), StandardCharsets.UTF_8));
+                    new FileInputStream("E:/projects/Java/Ontology/res/" + aFileName), StandardCharsets.UTF_8));
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }

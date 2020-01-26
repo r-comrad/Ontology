@@ -1,7 +1,7 @@
 import java.io.FileReader;
 import java.util.*;
 
-public class VariableDecoder {
+public class VariableDecoder extends Decoder {
     private RDFWriter mRDFWriter;
 
     private int mAssignmentCounter;
@@ -29,6 +29,7 @@ public class VariableDecoder {
         mContainersList = typesFile.readAllWords();
     }
 
+    @Override
     public List<String> process(List<String> aList)
     {
         List <String> result = new ArrayList<>();
@@ -42,7 +43,8 @@ public class VariableDecoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public boolean isVariableSequence(String aStr) {
+    @Override
+    public boolean checkSequence(String aStr) {
         return isTypeSequence(aStr) || isBasicAssignmentSequence(aStr);
     }
 
@@ -62,8 +64,12 @@ public class VariableDecoder {
         return Objects.equals(aStr, "=");
     }
 
+    @Override
+    public Type getType(){ return Type.VARIABLE; }
+
     //------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public void writePack()
     {
         variablePack();
@@ -158,7 +164,7 @@ public class VariableDecoder {
             // TODO: ofset for map
         }
 
-        for (int i = 2; i < aList.size();) {
+        for (int i = 2; i < aList.size(); ++i) {
             String curStr = aList.get(i);
             if (isBasicTypeSequence(curStr))
             {

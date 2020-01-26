@@ -1,19 +1,25 @@
 import java.util.*;
 
-public class FunctionDecoder {
+public class FunctionDecoder extends Decoder {
     private RDFWriter mRDFWriter;
     private HashSet<String> mUsedFunctions;
 
+    VariableDecoder mVariableDecoder;
+
     //TODO: function call without asignment
 
-    public FunctionDecoder(RDFWriter aRDFWriter)
+    public FunctionDecoder(RDFWriter aRDFWriter, VariableDecoder aVariableDecoder)
     {
         mRDFWriter = aRDFWriter;
         mUsedFunctions= new HashSet<>();
+        mVariableDecoder = aVariableDecoder;
     }
 
+    @Override
     public List<String> process(List<String> aList)
     {
+        mVariableDecoder.infunctionDeclarationDecoder(aList);
+
         List<String> result = new ArrayList<>();
         if (aList.size() > 1)
         {
@@ -27,12 +33,17 @@ public class FunctionDecoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public boolean isFunctionalSequence(String aStr) {
+    @Override
+    public boolean checkSequence(String aStr) {
         return Objects.equals(aStr, "(");
     }
 
+    @Override
+    public Type getType(){ return Type.FUNKTION; }
+
     //------------------------------------------------------------------------------------------------------------------
 
+    @Override
     public void writePack()
     {
         functionPack();
