@@ -1,4 +1,4 @@
-start;type;variable;function;conditions_types;basic_type;basic_variable;user_function;double;int;a;b;main;value0;if_1_0;value2;value1;value3;condition_1;else_block_1_1;
+start;type;variable;function;conditions_types;basic_type;basic_variable;user_function;if-else;double;int;a;b;main;condition_1;value0;if_1_0;value2;value1;value3;else_block_1_1;
 
 name;ISA;AKO;has_part;has_type;use;take;assignment;stores;read;write;return;implement;
 start;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;
@@ -9,15 +9,16 @@ conditions_types;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
 basic_type;nun;type;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
 basic_variable;nun;variable;nun;type;nun;nun;nun;nun;nun;nun;nun;start;
 user_function;nun;function;nun;nun;nun;type;nun;nun;nun;nun;type;start;
+if-else;nun;conditions_types;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
 double;basic_type;type;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
 int;basic_type;type;nun;nun;nun;nun;nun;nun;nun;nun;nun;start;
 a;basic_variable;variable;main;int;nun;type;nun;nun;nun;nun;int;start;
 b;basic_variable;variable;main;double;nun;type;nun;nun;nun;nun;int;start;
 main;user_function;function;nun;nun;nun;type;nun;nun;nun;nun;int;start;
+condition_1;if-else;conditions_types;main;nun;nun;type;nun;nun;nun;nun;int;start;
 value0;nun;nun;main;nun;nun;type;a;nun;nun;nun;int;start;
 if_1_0;nun;nun;condition_1;nun;nun;a;nun;nun;nun;nun;int;start;
-value2;nun;nun;condition_1;nun;nun;type;a;nun;nun;nun;int;start;
+value2;nun;nun;if_1_0;nun;nun;a;a;nun;nun;nun;int;start;
 value1;nun;nun;main;nun;nun;type;b;nun;nun;nun;int;start;
 value3;nun;nun;else_block_1_1;nun;nun;type;b;nun;nun;nun;int;start;
-condition_1;nun;nun;main;nun;nun;type;nun;nun;nun;nun;int;start;
 else_block_1_1;nun;nun;condition_1;nun;nun;type;nun;nun;nun;nun;int;start;

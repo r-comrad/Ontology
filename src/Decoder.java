@@ -9,4 +9,5 @@ public abstract class Decoder {
     public abstract boolean checkSequence(String aStr);
     public abstract void writePack();
     public abstract Type getType();
+    public void close(){}
 }

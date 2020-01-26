@@ -55,7 +55,7 @@ public class FunctionDecoder extends Decoder {
         mRDFWriter.write("function", "start", "implement");
         mRDFWriter.write("function", "type", "take");
         mRDFWriter.write("function", "type", "return");
-        mRDFWriter.write("user_function", "function", "AKO");
+        //mRDFWriter.write("user_function", "function", "AKO");
     }
 
     private void userFunctionPack() {

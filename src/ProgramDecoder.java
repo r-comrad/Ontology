@@ -29,60 +29,44 @@ public class ProgramDecoder {
     public void process() {
         List<String> list = new ArrayList();
         String str;
+        Decoder.Type prevType =  Decoder.Type.NUN;
         while (!Objects.equals(str = mFileReader.read(), "")) {
             if (isEndSequence(str)) {
                 List<String> connections = new ArrayList<>();
                 /*for(Decoder i : mDecoders)
                     if (i.checkSequence(str)) mType = i.getType();*/
 
-                for(Decoder i : mDecoders)
-                    if (mType == i.getType())
-                    {
+                for (Decoder i : mDecoders)
+                    if (mType == i.getType()) {
                         connections = i.process(list);
+                        //i.close();
                     }
-                /*if (mType == BlockType.VARIABLE)
                 {
-                    connections = mVariableDecoder.process(list);
-                }
-                else if (mType == BlockType.FUNKTION) {
-                    mVariableDecoder.infunctionDeclarationDecoder(list);
-                    connections = mFunctionDecoder.process(list);
-                }
-                else if(mType == BlockType.CONDITION)
-                {
-                    connections = mConditionDecoder.process(list);
-                }*/
+                    for (String i : connections) {
+                        //if (mCodeLevel.size() > 0 && connections.size() > 0)
 
-                /*if(mType == BlockType.CONDITION)
-                {
-                    String curStr = connections.get(0);
-                    if (curStr.startsWith("condition"))
-                    {
-                        mRDFWriter.writeLever(curStr, mCodeLevel.get(mCodeLevel.size() - 1));
-                        connections.remove(0);
+                        if (mCodeLevel.size() > 0) {
+                            mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
+                        }
+                        if (isLevelIncreaser(str)) {
+                            // TODO: need has_part?
+                            // если все - часть, то вынести в метод write
+                            mCodeLevel.add(new Pair(i, "has_part"));
+                        }
                     }
                 }
-                else*/ {
-                    for(String i : connections)
-                    {
-                        if (mCodeLevel.size() > 0) mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
-                    }
-                }
-
-
-                if (isLevelIncreaser(str)) {
-                    if (connections.size() > 0)
-                    {
-                        String lastBlockLabel = connections.get(0);
-                        mCodeLevel.add(new Pair(lastBlockLabel, "has_part"));
-                    }
-                    //mConditionDecoder.increaseLevel();
-                }
-                else if(isLevelDecreaser(str))
-                {
-                    //mConditionDecoder.decreaseLevel();
+                if (isLevelDecreaser(str)) {
                     mCodeLevel.remove(mCodeLevel.size() - 1);
                 }
+
+                if (prevType == Decoder.Type.NUN && mType != Decoder.Type.CONDITION)
+                {
+                    for (Decoder i : mDecoders)
+                        if (Decoder.Type.CONDITION == i.getType()) {
+                            i.close();
+                        }
+                }
+                prevType = mType;
 
                 list.clear();
                 mType = Decoder.Type.NUN;

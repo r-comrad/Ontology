@@ -12,6 +12,7 @@ public class ConditionDecoder extends Decoder {
     List<Integer> mConditionCounters;
 
     private int mUsedConditions;
+    // TODO: List<String> mConditionCounters;
 
     //private String lastBlock;
     //private boolean mLastBlockIsCondition;
@@ -30,8 +31,9 @@ public class ConditionDecoder extends Decoder {
     public void increaseLevel() {
         conditionAdder();
     }
+
     public void decreaseLevel() {
-       conditionCloser();
+        conditionCloser();
     }
 
     @Override
@@ -40,14 +42,10 @@ public class ConditionDecoder extends Decoder {
         new ArrayList<>();
 
         if (isIfSequence(aList.get(0))) {
-            result = conditionOpener();
-            List<String> secondResult = conditionDecoder(aList);
-            result.add(secondResult.get(0));
-        } else if (aList.size() > 1 && isElseIfSequence(aList.get(0), aList.get(1)) ||
-                isElseSequence(aList.get(0))) {
-            result = conditionDecoder(aList);
+            result.addAll(conditionOpener());
         }
 
+        result.addAll(conditionDecoder(aList));
         return result;
     }
 
@@ -72,15 +70,15 @@ public class ConditionDecoder extends Decoder {
     }
 
     @Override
-    public Type getType(){ return Type.CONDITION; }
+    public Type getType() {
+        return Type.CONDITION;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
-    public void writePack()
-    {
-        if (mConditionCounter > 0)
-        {
+    public void writePack() {
+        if (mConditionCounter > 0) {
             mRDFWriter.write("conditions_types", "start", "implement");
             conditionPack();
         }
@@ -93,6 +91,10 @@ public class ConditionDecoder extends Decoder {
     }
 
     //------------------------------------------------------------------------------------------------------------------
+
+    public void close() {
+        conditionCloser();
+    }
 
     private void conditionAdder() {
         mConditionNames.add("");
@@ -114,31 +116,33 @@ public class ConditionDecoder extends Decoder {
         return result;
     }
 
-    private void conditionCloser() {
-        int conditionNumber = mConditionNames.size() - 1;
-        String conditionName = mConditionNames.get(conditionNumber);
-        mConditionNames.remove(conditionNumber);
-        Integer conditionType = mConditionTypes.get(conditionNumber);
-        mConditionTypes.remove(conditionNumber);
+    public void conditionCloser() {
+        if (mConditionNames.size() > 0) {
+            int conditionNumber = mConditionNames.size() - 1;
+            String conditionName = mConditionNames.get(conditionNumber);
+            mConditionNames.remove(conditionNumber);
+            Integer conditionType = mConditionTypes.get(conditionNumber);
+            mConditionTypes.remove(conditionNumber);
 
-        String parent = "________PC";
-        if (conditionType == -1) {
-            return;
-        } else if (conditionType == 1) {
-            parent = "if";
-            mUsedConditions |= 1;
-            mConditionTypes.set(conditionNumber, 1);
-        } else if (conditionType == 3) {
-            parent = "if-else";
-            mUsedConditions |= 2;
-        } else if (conditionType > 3) {
-            parent = "if-else_tree";
-            mUsedConditions |= 4;
+            String parent = "________PC";
+            if (conditionType == -1) {
+                return;
+            } else if (conditionType == 1) {
+                parent = "if";
+                mUsedConditions |= 1;
+                //mConditionTypes.set(conditionNumber, 1);
+            } else if (conditionType == 3) {
+                parent = "if-else";
+                mUsedConditions |= 2;
+            } else if (conditionType > 3) {
+                parent = "if-else_tree";
+                mUsedConditions |= 4;
+            }
+            mRDFWriter.write(conditionName, parent, "ISA");
         }
-        mRDFWriter.write(conditionName, parent, "ISA");
     }
 
-    private List<String>  conditionDecoder(List<String> aList) {
+    private List<String> conditionDecoder(List<String> aList) {
         List<String> result = new ArrayList<>();
         // TODO: if else if (2 условия)
         //TODO: funktion call inside condition
@@ -147,25 +151,20 @@ public class ConditionDecoder extends Decoder {
         int subConditionNumber = mConditionCounters.get(conditionNumber);
 
         String blockType = "________BT";
+        Integer curType = mConditionTypes.get(conditionNumber);
         if (isIfSequence(aList.get(0))) {
             blockType = "if";
-
-            Integer curType = mConditionTypes.get(conditionNumber);
             mConditionTypes.set(conditionNumber, curType + 1);
         } else if (aList.size() > 1 && isElseIfSequence(aList.get(0), aList.get(1))) {
             blockType = "else-if_block";
             aList.remove(0);
-
-            Integer curType = mConditionTypes.get(conditionNumber);
             mConditionTypes.set(conditionNumber, curType + 4);
         } else if (isElseSequence(aList.get(0))) {
             blockType = "else_block";
-
-            Integer curType = mConditionTypes.get(conditionNumber);
             mConditionTypes.set(conditionNumber, curType + 2);
         }
         String blockName = blockType + "_" + mConditionCounter + "_" + subConditionNumber;
-        mRDFWriter.write(blockName, conditionName, "has_part");
+        //mRDFWriter.write(blockName, conditionName, "has_part");
 
         ++subConditionNumber;
         mConditionCounters.set(conditionNumber, subConditionNumber);
