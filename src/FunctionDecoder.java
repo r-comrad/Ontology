@@ -50,7 +50,7 @@ public class FunctionDecoder extends Decoder {
 
     private void functionPack() {
         mRDFWriter.write("function", "start", "implement");
-        mRDFWriter.write("function", "type", "take");
+        mRDFWriter.write("function", "type", "has_part");
         mRDFWriter.write("function", "type", "return");
     }
 
@@ -94,7 +94,7 @@ public class FunctionDecoder extends Decoder {
         mRDFWriter.write(aList.get(1), aList.get(0), "return");
         mRDFWriter.write(aList.get(1), "user_function", "ISA");
         for (int i = 2; i < aList.size(); ++i) {
-            mRDFWriter.write(aList.get(1), aList.get(i + 1), "take");
+            mRDFWriter.write(aList.get(1), aList.get(i + 1), "has_part");
         }
     }
 }

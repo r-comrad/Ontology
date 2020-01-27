@@ -14,14 +14,12 @@ public class CodeReader {
 
     public CodeReader(OntologyTree aOntology) {
         mOntology = aOntology;
-        mReader = new MyFileReader("code_ontology.myRDF");
+        mReader = new MyFileReader("output_ontology.myRDF");
 
         process();
     }
 
     public void process() {
-
-
         String obj, subj, pred;
         while (!Objects.equals(obj = mReader.read(), "") &&
                 !Objects.equals(subj = mReader.read(), "")&&

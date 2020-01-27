@@ -5,7 +5,9 @@ public class CodeParser {
     private MyFileWriter mWriter;
 
     public CodeParser() {
-        mReader = new MyFileReader("code.cpp");
+        mReader = new MyFileReader("code_kawai_A.cpp");
+        //mReader = new MyFileReader("code_cycle.cpp");
+        //mReader = new MyFileReader("code_simple.cpp");
         mWriter = new MyFileWriter("parsed_code.cpp");
     }
 

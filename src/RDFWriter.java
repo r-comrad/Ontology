@@ -2,7 +2,7 @@ public class RDFWriter {
     private MyFileWriter mFileWriter;
 
     public RDFWriter() {
-        mFileWriter = new MyFileWriter("code_ontology.myRDF");
+        mFileWriter = new MyFileWriter("output_ontology.myRDF");
     }
 
     public RDFWriter(String aFileName) {

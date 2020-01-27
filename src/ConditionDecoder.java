@@ -155,10 +155,13 @@ public class ConditionDecoder extends Decoder {
         for (int i = 1; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
-                mRDFWriter.write(blockName, aList.get(i), "take");
+                mRDFWriter.write(blockName, aList.get(i), "has_part");
         }
 
         result.add(blockName);
+
+        String conditionName = mConditionNames.get(conditionNumber);
+        mRDFWriter.write(conditionName, blockName, "has_part");
         return result;
     }
 }

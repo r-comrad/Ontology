@@ -21,6 +21,7 @@ public class ProgramDecoder {
         mDecoders.add(temp);
         mDecoders.add(new FunctionDecoder(mRDFWriter, temp));
         mDecoders.add(new ConditionDecoder(mRDFWriter));
+        mDecoders.add(new CycleDecoder(mRDFWriter, temp));
 
         mCodeLevel = new ArrayList<>();
     }
@@ -39,14 +40,15 @@ public class ProgramDecoder {
                         //i.close();
                     }
                 {
+                    if (mCodeLevel.size() > 0 && connections.size() > 0) {
+                        mRDFWriter.writeLever(connections.get(0), mCodeLevel.get(mCodeLevel.size() - 1));
+                    }
+
                     for (String i : connections) {
-                        if (mCodeLevel.size() > 0) {
-                            mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
-                        }
                         if (isLevelIncreaser(str)) {
                             // TODO: need has_part?
                             // если все - часть, то вынести в метод write
-                            mCodeLevel.add(new Pair(i, "has_part"));
+                            mCodeLevel.add(new Pair(i, "include"));
                         }
                     }
                 }
@@ -66,8 +68,9 @@ public class ProgramDecoder {
                 mType = Decoder.Type.NUN;
             } else {
                 {
-                    for (Decoder i : mDecoders)
-                        if (i.checkSequence(str)) mType = i.getType();
+                    if (mType == Decoder.Type.NUN || mType == Decoder.Type.VARIABLE)
+                        for (Decoder i : mDecoders)
+                            if (i.checkSequence(str)) mType = i.getType();
                 }
 
                 if (!isUnusedSequence(str)) list.add(str);

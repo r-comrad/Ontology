@@ -125,7 +125,7 @@ public class VariableDecoder extends Decoder {
         for (int i = 1; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
-                mRDFWriter.write(valueName, aList.get(i), "use");
+                mRDFWriter.write(valueName, aList.get(i), "has_part");
             //TODO: use -> has_part
         }
         return result;
@@ -165,6 +165,21 @@ public class VariableDecoder extends Decoder {
                 aList.remove(i);
                 aList.remove(i);
                 i++;
+            }
+        }
+    }
+
+    public void inCycleDeclarationDecoder(List<String> aList) {
+        for (int i = 1; i < aList.size(); ++i) {
+            String curStr = aList.get(i);
+            if (isBasicTypeSequence(curStr)) {
+                basicVariableAssignmentDecoder(aList.subList(i, i + 1));
+                aList.remove(i);
+                aList.remove(i + 1);
+                aList.remove(i + 1);
+                i += 3;
+            } else if (isContainerSequence(curStr)) {
+                //TODO:
             }
         }
     }

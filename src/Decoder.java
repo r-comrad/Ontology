@@ -2,7 +2,7 @@ import java.util.List;
 
 public abstract class Decoder {
     enum Type {
-        NUN, FUNKTION, VARIABLE, CONDITION;
+        NUN, FUNKTION, VARIABLE, CONDITION, CYCLE;
     }
 
     public abstract List<String> process(List<String> aList);
