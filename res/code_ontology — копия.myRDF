@@ -1,0 +1,14 @@
+main int return
+main user_function ISA
+cycle_1 cycle ISA
+cycle_1 main has_part
+type start implement
+basic_type type AKO
+variable start implement
+variable type has_type
+basic_variable variable AKO
+function start implement
+function type take
+function type return
+user_function function AKO
+cycle start implement
