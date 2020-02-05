@@ -1,7 +1,6 @@
-import java.io.FileReader;
 import java.util.*;
 
-public class VariableDecoder extends Decoder {
+public class DecoderVariable extends Decoder {
     private RDFWriter mRDFWriter;
 
     private int mAssignmentCounter;
@@ -14,7 +13,7 @@ public class VariableDecoder extends Decoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public VariableDecoder(RDFWriter aRDFWriter) {
+    public DecoderVariable(RDFWriter aRDFWriter) {
         mRDFWriter = aRDFWriter;
         mAssignmentCounter = 0;
 
@@ -29,7 +28,7 @@ public class VariableDecoder extends Decoder {
     }
 
     @Override
-    public List<String> process(List<String> aList) {
+    public List<String> process(List<String> aList, int aLevel) {
         List<String> result = new ArrayList<>();
         //TODO: const types
         if (isBasicTypeSequence(aList.get(0))) result = basicVariableDeclarationDecoder(aList);
@@ -63,8 +62,8 @@ public class VariableDecoder extends Decoder {
     }
 
     @Override
-    public Type getType() {
-        return Type.VARIABLE;
+    public CommandManager.Type getType() {
+        return CommandManager.Type.VARIABLE;
     }
 
     //------------------------------------------------------------------------------------------------------------------

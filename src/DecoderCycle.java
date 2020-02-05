@@ -3,28 +3,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-public class CycleDecoder extends Decoder {
+public class DecoderCycle extends Decoder {
     private RDFWriter mRDFWriter;
-    VariableDecoder mVariableDecoder;
+    DecoderVariable mDecoderVariable;
     private int mCycleCounter;
 
     private HashSet<String> mUsedCycles;
 
-    public CycleDecoder(RDFWriter aRDFWriter, VariableDecoder aVariableDecoder) {
+    public DecoderCycle(RDFWriter aRDFWriter, DecoderVariable aDecoderVariable) {
         mRDFWriter = aRDFWriter;
-        mVariableDecoder = aVariableDecoder;
+        mDecoderVariable = aDecoderVariable;
         mCycleCounter = 0;
 
         mUsedCycles = new HashSet<>();
     }
 
     @Override
-    public List<String> process(List<String> aList) {
+    public List<String> process(List<String> aList, int aLevel) {
         List<String> result = new ArrayList<>();
 
         if (isForSequence(aList.get(0)))
         {
-            mVariableDecoder.inCycleDeclarationDecoder(aList);
+            mDecoderVariable.inCycleDeclarationDecoder(aList);
             String cycleName = "for" + "_" + ++mCycleCounter;
             mRDFWriter.write(cycleName, aList.get(1), "has_part");
             mRDFWriter.write(cycleName, "cycle_for", "ISA");
@@ -61,8 +61,8 @@ public class CycleDecoder extends Decoder {
     }
 
     @Override
-    public Type getType() {
-        return Type.CYCLE;
+    public CommandManager.Type getType() {
+        return CommandManager.Type.CYCLE;
     }
 
     //------------------------------------------------------------------------------------------------------------------

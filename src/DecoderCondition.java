@@ -2,36 +2,43 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ConditionDecoder extends Decoder {
+public class DecoderCondition extends Decoder {
     private RDFWriter mRDFWriter;
 
     private int mConditionCounter;
     List<String> mConditionNames;
     List<Integer> mConditionTypes;
     List<Integer> mConditionCounters;
+    List<Integer> mConditionLevels;
 
     private int mUsedConditions;
     // TODO: List<String> mConditionCounters;
 
-    public ConditionDecoder(RDFWriter aRDFWriter) {
+    public DecoderCondition(RDFWriter aRDFWriter) {
         mRDFWriter = aRDFWriter;
 
         mConditionCounter = 0;
         mConditionNames = new ArrayList<>();
         mConditionTypes = new ArrayList<>();
         mConditionCounters = new ArrayList<>();
+        mConditionLevels = new ArrayList<>();
 
         mUsedConditions = 0;
     }
 
     @Override
-    public List<String> process(List<String> aList) {
+    public List<String> process(List<String> aList, int aLevel) {
         List<String> result = new ArrayList<>();
         new ArrayList<>();
 
+        while(mConditionLevels.get(mConditionLevels.size() - 1) > aLevel) conditionCloser();
+
         if (isIfSequence(aList.get(0))) {
+            if(mConditionLevels.get(mConditionLevels.size() - 1) == aLevel) conditionCloser();
             result.addAll(conditionOpener());
         }
+
+
 
         result.addAll(conditionDecoder(aList));
         return result;
@@ -58,8 +65,8 @@ public class ConditionDecoder extends Decoder {
     }
 
     @Override
-    public Type getType() {
-        return Type.CONDITION;
+    public CommandManager.Type getType() {
+        return CommandManager.Type.CONDITION;
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -1,22 +1,22 @@
 import java.util.*;
 
-public class FunctionDecoder extends Decoder {
+public class DecoderFunction extends Decoder {
     private RDFWriter mRDFWriter;
     private HashSet<String> mUsedFunctions;
 
-    VariableDecoder mVariableDecoder;
+    DecoderVariable mDecoderVariable;
 
     //TODO: function call without asignment
 
-    public FunctionDecoder(RDFWriter aRDFWriter, VariableDecoder aVariableDecoder) {
+    public DecoderFunction(RDFWriter aRDFWriter, DecoderVariable aDecoderVariable) {
         mRDFWriter = aRDFWriter;
         mUsedFunctions = new HashSet<>();
-        mVariableDecoder = aVariableDecoder;
+        mDecoderVariable = aDecoderVariable;
     }
 
     @Override
-    public List<String> process(List<String> aList) {
-        mVariableDecoder.infunctionDeclarationDecoder(aList);
+    public List<String> process(List<String> aList, int aLevel) {
+        mDecoderVariable.infunctionDeclarationDecoder(aList);
 
         List<String> result = new ArrayList<>();
         if (aList.size() > 1) {
@@ -35,8 +35,8 @@ public class FunctionDecoder extends Decoder {
     }
 
     @Override
-    public Type getType() {
-        return Type.FUNKTION;
+    public CommandManager.Type getType() {
+        return CommandManager.Type.FUNCTION;
     }
 
     //------------------------------------------------------------------------------------------------------------------

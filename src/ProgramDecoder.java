@@ -5,52 +5,68 @@ public class ProgramDecoder
     private MyFileReader mFileReader;
     RDFWriter mRDFWriter;
 
-    Decoder.Type mType;
+    CommandManager mCommandManager;
 
-    Map<Decoder.Type, Decoder> mDecoders;
+    Map<CommandManager.Type, Decoder> mDecoders;
 
     ArrayList<Pair<String, String>> mCodeLevel;
+
+    int mLevel;
 
     public ProgramDecoder()
     {
         mFileReader = new MyFileReader("parsed_code.cpp");
         mRDFWriter = new RDFWriter();
 
-        mType = Decoder.Type.NUN;
+        mCommandManager = new CommandManager();
+        mCommandManager.reset();
 
         mDecoders = new HashMap();
-        VariableDecoder temp = new VariableDecoder(mRDFWriter);
-        mDecoders.put(Decoder.Type.VARIABLE, temp);
-        mDecoders.put(Decoder.Type.FUNKTION, new FunctionDecoder(mRDFWriter, temp));
-        mDecoders.put(Decoder.Type.CONDITION, new ConditionDecoder(mRDFWriter));
-        mDecoders.put(Decoder.Type.CYCLE, new CycleDecoder(mRDFWriter, temp));
+        DecoderVariable temp = new DecoderVariable(mRDFWriter);
+        mDecoders.put(CommandManager.Type.VARIABLE, temp);
+        mDecoders.put(CommandManager.Type.FUNCTION, new DecoderFunction(mRDFWriter, temp));
+        mDecoders.put(CommandManager.Type.CONDITION, new DecoderCondition(mRDFWriter));
+        mDecoders.put(CommandManager.Type.CYCLE, new DecoderCycle(mRDFWriter, temp));
+        mDecoders.put(CommandManager.Type.BRACKET, new DecoderCycle(mRDFWriter, temp));
+        mDecoders.put(CommandManager.Type.END_LINE, new DecoderCycle(mRDFWriter, temp));
+        mDecoders.put(CommandManager.Type.NUN, new DecoderCycle(mRDFWriter, temp));
 
         mCodeLevel = new ArrayList<>();
+
+        mLevel= 0;
     }
 
     public void process()
     {
         List<String> list = new ArrayList();
         String str;
-        Decoder.Type prevType = Decoder.Type.NUN;
+
         while (!Objects.equals(str = mFileReader.read(), ""))
         {
+            for (Map.Entry<CommandManager.Type, Decoder> entry : mDecoders.entrySet())
+            {
+                if (entry.getValue().checkSequence(str))
+                    mCommandManager.addCondition(entry.getValue().getType());
+            }
+
             if (isEndSequence(str))
             {
-                List<String> connections = new ArrayList<>();
+                List<String> connections = mDecoders.get(mCommandManager.getType()).process(list, mLevel);
 
-                if (mType != Decoder.Type.NUN)
-                {
-                    connections = mDecoders.get(mType).process(list);
-                }
                 if (mCodeLevel.size() > 0 && connections.size() > 0)
                 {
                     mRDFWriter.writeLever(connections.get(0), mCodeLevel.get(mCodeLevel.size() - 1));
                 }
 
-                for (String i : connections)
+                if (isLevelDecreaser(str))
                 {
-                    if (isLevelIncreaser(str))
+                    --mLevel;
+                    mCodeLevel.remove(mCodeLevel.size() - 1);
+                }
+                else if (isLevelIncreaser(str))
+                {
+                    ++mLevel;
+                    for (String i : connections)
                     {
                         // TODO: need has_part?
                         // если все - часть, то вынести в метод write
@@ -58,49 +74,25 @@ public class ProgramDecoder
                     }
                 }
 
-                if (isLevelDecreaser(str))
-                {
-                    mCodeLevel.remove(mCodeLevel.size() - 1);
-                }
-
-                if (prevType == Decoder.Type.NUN && mType != Decoder.Type.CONDITION)
-                {
-                    for (Map.Entry<Decoder.Type, Decoder> entry : mDecoders.entrySet())
-                    {
-                        if (Decoder.Type.CONDITION == entry.getValue().getType())
-                        {
-                            entry.getValue().close();
-                        }
-                    }
-                }
-                prevType = mType;
-
                 list.clear();
-                mType = Decoder.Type.NUN;
+                mCommandManager.reset();
             }
             else
             {
-                if (mType == Decoder.Type.NUN || mType == Decoder.Type.VARIABLE) for (Map.Entry<Decoder.Type, Decoder> entry : mDecoders.entrySet())
-                {
-                    if (entry.getValue().checkSequence(str)) mType = entry.getValue().getType();
-                }
-
-                if (!isUnusedSequence(str)) list.add(str);
+                list.add(str);
             }
+
         }
 
-        for (Map.Entry<Decoder.Type, Decoder> entry : mDecoders.entrySet())
+        for (Map.Entry<CommandManager.Type, Decoder> entry : mDecoders.entrySet())
         {
-            if (Decoder.Type.CONDITION == entry.getValue().getType())
-            {
-                entry.getValue().writePack();
-            }
+            entry.getValue().writePack();
         }
 
         mRDFWriter.close();
     }
 
-
+    // TODO: int Bracket Decoder
     public boolean isLevelIncreaser(String str)
     {
         return Objects.equals(str, "{");
@@ -111,6 +103,7 @@ public class ProgramDecoder
         return Objects.equals(str, "cin") || Objects.equals(str, "cout");
     }
 
+    // TODO: int Bracket Decoder
     public boolean isLevelDecreaser(String str)
     {
         return Objects.equals(str, "}");
@@ -118,7 +111,8 @@ public class ProgramDecoder
 
     public boolean isEndSequence(String str)
     {
-        return Objects.equals(str, ";") || Objects.equals(str, "{") || Objects.equals(str, "}");
+        return mDecoders.get(CommandManager.Type.END_LINE).checkSequence(str) ||
+                mDecoders.get(CommandManager.Type.BRACKET).checkSequence(str);
     }
 
     public boolean isUnusedSequence(String s)

@@ -1,0 +1,15 @@
+while_1 main has_part
+while_1 cycle_while ISA
+while_2 int has_part
+while_2 cycle_while ISA
+cycle start implement
+cycle_while cycle AKO
+type start implement
+basic_type type AKO
+variable start implement
+variable type has_type
+basic_variable variable AKO
+function start implement
+function type has_part
+function type return
+user_function function AKO
