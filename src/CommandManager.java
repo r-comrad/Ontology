@@ -37,14 +37,14 @@ public class CommandManager
     {
         if (mTypeConditions.contains(Type.CYCLE)) return Type.CYCLE;
 
+        else if (mTypeConditions.contains(Type.CONDITION)) return Type.CONDITION;
+
         else if (mTypeConditions.contains(Type.FUNCTION) &&
                 mTypeConditions.contains(Type.VARIABLE) &&
                 mTypeConditions.contains(Type.BRACKET))
             return Type.FUNCTION;
 
         else if (mTypeConditions.contains(Type.VARIABLE)) return Type.VARIABLE;
-
-        else if (mTypeConditions.contains(Type.CONDITION)) return Type.CONDITION;
 
         else if (mTypeConditions.contains(Type.END_LINE)) return Type.END_LINE;
         else if (mTypeConditions.contains(Type.BRACKET)) return Type.BRACKET;

@@ -3,7 +3,7 @@ int main (  )
 	int n ,  m ,  k ,  l ; 
 	vector  < int >  a ( n )  ; 
 	for  ( int i  =  0 ;  i  <  n ;  i +  +  ) 
-		cin  >  >  a[i] ; 
+	 { cin  >  >  a[i] ;  } 
 	int i  =  0 ; 
 	int o  =  0 ; 
 	while  ( i  <  n  -  1 ) 

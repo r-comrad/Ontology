@@ -22,4 +22,9 @@ public class RDFWriter {
     {
         mFileWriter.close();
     }
+
+    public void newLine()
+    {
+        mFileWriter.newLine();
+    }
 }

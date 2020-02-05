@@ -1,14 +1,100 @@
-while_1 main has_part
-while_1 cycle_while ISA
-while_2 int has_part
+main int return
+main user_function ISA
+
+n int has_type
+n basic_variable ISA
+m int has_type
+m basic_variable ISA
+k int has_type
+k basic_variable ISA
+l int has_type
+l basic_variable ISA
+n main include
+m main include
+k main include
+l main include
+
+a vector has_type
+a int stores
+a container ISA
+a n has_part
+a main include
+
+i int has_type
+i basic_variable ISA
+value0 i assignment
+for_1 i has_part
+for_1 cycle_for ISA
+for_1 main include
+
+
+
+i int has_type
+i basic_variable ISA
+value1 i assignment
+i main include
+
+o int has_type
+o basic_variable ISA
+value2 o assignment
+o main include
+
+while_2 ( has_part
 while_2 cycle_while ISA
+while_2 main include
+
+value3 l assignment
+value3 min has_part
+value3 m has_part
+value3 a[i] has_part
+value3 while_2 include
+
+value4 i assignment
+value4 l has_part
+value4 while_2 include
+
+
+if_1_0 o has_part
+if_1_0 k has_part
+if_1_0 m has_part
+condition_1 if_1_0 has_part
+condition_1 while_2 include
+
+condition_1 if ISA
+if_2_1 i has_part
+if_2_1 n has_part
+condition_2 if_2_1 has_part
+condition_2 while_2 include
+
+
+
+
+condition_2 if ISA
+if_3_2 l has_part
+condition_3 if_3_2 has_part
+condition_3 condition_2 include
+
+
+
+
+
+
+
+
 cycle start implement
+cycle_for cycle AKO
 cycle_while cycle AKO
 type start implement
 basic_type type AKO
 variable start implement
 variable type has_type
+container_type type AKO
+container variable AKO
+vector container_type ISA
 basic_variable variable AKO
+int basic_type ISA
+conditions_types start implement
+if conditions_types AKO
 function start implement
 function type has_part
 function type return

@@ -31,10 +31,13 @@ public class DecoderCondition extends Decoder {
         List<String> result = new ArrayList<>();
         new ArrayList<>();
 
-        while(mConditionLevels.get(mConditionLevels.size() - 1) > aLevel) conditionCloser();
+        while(mConditionLevels.size() > 0 &&
+                mConditionLevels.get(mConditionLevels.size() - 1) > aLevel) conditionCloser();
 
         if (isIfSequence(aList.get(0))) {
-            if(mConditionLevels.get(mConditionLevels.size() - 1) == aLevel) conditionCloser();
+            if(mConditionLevels.size() > 0 &&
+                    mConditionLevels.get(mConditionLevels.size() - 1) == aLevel) conditionCloser();
+            mConditionLevels.add(aLevel);
             result.addAll(conditionOpener());
         }
 

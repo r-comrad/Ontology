@@ -18,6 +18,10 @@ public class DecoderFunction extends Decoder {
     public List<String> process(List<String> aList, int aLevel) {
         mDecoderVariable.infunctionDeclarationDecoder(aList);
 
+        //aList.remove("(");
+        //aList.remove(")");
+        clearFunctionCall(aList);
+
         List<String> result = new ArrayList<>();
         if (aList.size() > 1) {
             functionDecoder(aList);

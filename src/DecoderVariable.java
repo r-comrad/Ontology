@@ -109,9 +109,26 @@ public class DecoderVariable extends Decoder {
         List<String> result = new ArrayList<>();
         mUsedBasicTypes.add(aList.get(0));
         for (int i = 1; i < aList.size(); ++i) {
-            mRDFWriter.write(aList.get(i), aList.get(0), "has_type");
-            mRDFWriter.write(aList.get(i), "basic_variable", "ISA");
-            result.add(aList.get(i));
+            String s = aList.get(i);
+
+            if (isBasicAssignmentSequence(s))
+            {
+                int j = i;
+                while (j < aList.size() &&
+                        (!Objects.equals(aList.get(j), ",") || !Objects.equals(aList.get(j), ";")))
+                {
+                    ++j;
+                }
+                List <String> temp = aList.subList(i - 1, j);
+                basicVariableAssignmentDecoder(temp);
+                i = j;
+            }
+            else
+            {
+                mRDFWriter.write(s, aList.get(0), "has_type");
+                mRDFWriter.write(s, "basic_variable", "ISA");
+                result.add(s);
+            }
         }
         return result;
     }
@@ -133,14 +150,29 @@ public class DecoderVariable extends Decoder {
     //------------------------------------------------------------------------------------------------------------------
 
     // TODO: ofset for map
-    private List<String> containerDeclarationDecoder(List<String> aList) {
+    private List<String> containerDeclarationDecoder(List<String> aList)
+    {
         List<String> result = new ArrayList<>();
         mUsedContainers.add(aList.get(0));
-        for (int i = 2; i < aList.size(); ++i) {
-            result.add(aList.get(i));
-            mRDFWriter.write(aList.get(i), aList.get(0), "has_type");
-            mRDFWriter.write(aList.get(i), aList.get(1), "stores");
-            mRDFWriter.write(aList.get(i), "container", "ISA");
+        //for (String s : aList) {
+        for (int i = 2; i < aList.size(); ++i)
+        {
+            String s = aList.get(i);
+            if (!isFunctionCallSequence(s))
+            {
+                result.add(s);
+                mRDFWriter.write(s, aList.get(0), "has_type");
+                mRDFWriter.write(s, aList.get(1), "stores");
+                mRDFWriter.write(s, "container", "ISA");
+            }
+            else
+            {
+                if (isFunctionCallOpenerSequence(s))
+                {
+                    mRDFWriter.write(aList.get(i - 1), aList.get(i + 1), "has_part");
+                    aList.remove(aList.get(i + 1));
+                }
+            }
         }
         return result;
     }
@@ -169,6 +201,9 @@ public class DecoderVariable extends Decoder {
     }
 
     public void inCycleDeclarationDecoder(List<String> aList) {
+
+        //TODO: conteiner
+        /*
         for (int i = 1; i < aList.size(); ++i) {
             String curStr = aList.get(i);
             if (isBasicTypeSequence(curStr)) {
@@ -180,6 +215,6 @@ public class DecoderVariable extends Decoder {
             } else if (isContainerSequence(curStr)) {
                 //TODO:
             }
-        }
+        }*/
     }
 }

@@ -21,12 +21,21 @@ public class DecoderCycle extends Decoder {
     @Override
     public List<String> process(List<String> aList, int aLevel) {
         List<String> result = new ArrayList<>();
-
+        //TODO: for without breakets {}
+        //TODO: conditions in cycle{}
         if (isForSequence(aList.get(0)))
         {
-            mDecoderVariable.inCycleDeclarationDecoder(aList);
             String cycleName = "for" + "_" + ++mCycleCounter;
-            mRDFWriter.write(cycleName, aList.get(1), "has_part");
+
+            List <String> temp = aList.subList(2, aList.indexOf(";"));
+            //mDecoderVariable.inCycleDeclarationDecoder(temp);
+            temp = mDecoderVariable.process(temp, 0);
+            for(String s : temp)
+            {
+                mRDFWriter.write(cycleName, s, "has_part");
+            }
+
+            //mRDFWriter.write(cycleName, aList.get(1), "has_part");
             mRDFWriter.write(cycleName, "cycle_for", "ISA");
 
             result.add(cycleName);

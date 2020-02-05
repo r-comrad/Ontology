@@ -35,6 +35,15 @@ public class MyFileWriter {
         }
     }
 
+    public void newLine() {
+        try {
+            mFile.write('\n');
+            //System.out.println(result);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
     public void close() {
         try {
             mFile.close();

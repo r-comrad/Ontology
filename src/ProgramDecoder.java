@@ -27,9 +27,9 @@ public class ProgramDecoder
         mDecoders.put(CommandManager.Type.FUNCTION, new DecoderFunction(mRDFWriter, temp));
         mDecoders.put(CommandManager.Type.CONDITION, new DecoderCondition(mRDFWriter));
         mDecoders.put(CommandManager.Type.CYCLE, new DecoderCycle(mRDFWriter, temp));
-        mDecoders.put(CommandManager.Type.BRACKET, new DecoderCycle(mRDFWriter, temp));
-        mDecoders.put(CommandManager.Type.END_LINE, new DecoderCycle(mRDFWriter, temp));
-        mDecoders.put(CommandManager.Type.NUN, new DecoderCycle(mRDFWriter, temp));
+        mDecoders.put(CommandManager.Type.BRACKET, new DecoderBracket());
+        mDecoders.put(CommandManager.Type.END_LINE, new DecoderEndLine());
+        mDecoders.put(CommandManager.Type.NUN, new DecoderNun());
 
         mCodeLevel = new ArrayList<>();
 
@@ -45,17 +45,26 @@ public class ProgramDecoder
         {
             for (Map.Entry<CommandManager.Type, Decoder> entry : mDecoders.entrySet())
             {
-                if (entry.getValue().checkSequence(str))
-                    mCommandManager.addCondition(entry.getValue().getType());
+                if (entry.getValue().checkSequence(str)) mCommandManager.addCondition(entry.getValue().getType());
             }
 
             if (isEndSequence(str))
             {
                 List<String> connections = mDecoders.get(mCommandManager.getType()).process(list, mLevel);
 
-                if (mCodeLevel.size() > 0 && connections.size() > 0)
+                if (mCodeLevel.size() > 0)
                 {
-                    mRDFWriter.writeLever(connections.get(0), mCodeLevel.get(mCodeLevel.size() - 1));
+                    if (mCommandManager.getType() != CommandManager.Type.CONDITION)
+                        for (String i : connections)
+                        {
+                            {
+                                mRDFWriter.writeLever(i, mCodeLevel.get(mCodeLevel.size() - 1));
+                            }
+                        }
+                    else if (connections.size() > 0)
+                    {
+                        mRDFWriter.writeLever(connections.get(0), mCodeLevel.get(mCodeLevel.size() - 1));
+                    }
                 }
 
                 if (isLevelDecreaser(str))
@@ -76,10 +85,11 @@ public class ProgramDecoder
 
                 list.clear();
                 mCommandManager.reset();
+                mRDFWriter.newLine();
             }
             else
             {
-                list.add(str);
+                if (!isUnusedSequence(str)) list.add(str);
             }
 
         }
@@ -111,13 +121,20 @@ public class ProgramDecoder
 
     public boolean isEndSequence(String str)
     {
-        return mDecoders.get(CommandManager.Type.END_LINE).checkSequence(str) ||
-                mDecoders.get(CommandManager.Type.BRACKET).checkSequence(str);
+        if (mCommandManager.getType() != CommandManager.Type.CYCLE)
+        {
+            return mDecoders.get(CommandManager.Type.END_LINE).checkSequence(str) ||
+                    mDecoders.get(CommandManager.Type.BRACKET).checkSequence(str);
+        }
+        else
+        {
+            return mDecoders.get(CommandManager.Type.BRACKET).checkSequence(str);
+        }
     }
 
     public boolean isUnusedSequence(String s)
     {
-        return Objects.equals(s, ",") || Objects.equals(s, "(") || Objects.equals(s, ")") ||
+        return Objects.equals(s, ",") /*|| Objects.equals(s, "(") || Objects.equals(s, ")") */||
                 /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") || Objects.equals(s, ">") || Objects.equals(s, "<") || Objects.equals(s, "&&") || Objects.equals(s, "||") || Objects.equals(s, "!=") || Objects.equals(s, "==");
     }
 }
