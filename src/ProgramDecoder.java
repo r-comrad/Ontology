@@ -50,6 +50,7 @@ public class ProgramDecoder
 
             if (isEndSequence(str))
             {
+                if (mCodeLevel.size() > 0) mCommandManager.setInsideFunction();
                 List<String> connections = mDecoders.get(mCommandManager.getType()).process(list, mLevel);
 
                 if (mCodeLevel.size() > 0)

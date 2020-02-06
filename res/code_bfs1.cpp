@@ -34,7 +34,7 @@ int main(){
 			}
 		}
 	}
-if (v[f][0]==10e8) cout << 0;
-	else cout << v[f][0];
+	if (v[f][0]==10e8) {cout << 0;}
+	else {cout << v[f][0];}
 	return 0;
 }

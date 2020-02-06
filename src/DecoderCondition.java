@@ -134,6 +134,7 @@ public class DecoderCondition extends Decoder {
                 mUsedConditions |= 4;
             }
             mRDFWriter.write(conditionName, parent, "ISA");
+            mConditionLevels.remove(mConditionLevels.size() - 1);
         }
     }
 

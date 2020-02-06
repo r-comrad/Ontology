@@ -1,29 +1,31 @@
-int main (  ) 
- { 
-	int n ,  m ,  k ,  l ; 
-	vector  < int >  a ( n )  ; 
-	for  ( int i  =  0 ;  i  <  n ;  i +  +  ) 
-	 { cin  >  >  a[i] ;  } 
-	int i  =  0 ; 
-	int o  =  0 ; 
-	while  ( i  <  n  -  1 ) 
-	 { 
-		l  =  min ( m ,  a[i] )  ; 
-		i  +  =  l ; 
-		o +  +  ; 
-		if  ( o % k  =  =  0 ) 
-		 { 	m -  -  ;  } 
-		if  ( i  >  =  n ) 
-		 { 
-			cout  <  <  " - 2" ; 
-			return 0 ; 
-		 } 
-		if  ( l  =  =  0 ) 
-		 { 
-			cout  <  <  " - 1" ; 
-			return 0 ; 
+ 
+int main (  )  { 
+	int n ,  s ,  f ; 
+	s  -  =  1 ; 
+	f  -  =  1 ; 
+	vector  < vector  < int >  >  v ( n ,  vector  < int >  { int ( 10e8 )  }  )  ; 
+	v[s][0]  =  0 ; 
+	for  ( int i  =  0 ;  i  <  n ;   +  + i )  { 
+		for  ( int j  =  0 ;  j  <  n ;   +  + j )  { 
+			int mtx ; 
+			if  ( mtx  =  =  1 ) 
+				v[i].push_back ( j )  ; 
 		 } 
 	 } 
-	cout  <  <  o ; 
-	return 0 ; 
+	queue  < int >  p ; 
+	int b ; 
+	p.push ( s )  ; 
+	while  ( !p.empty (  )  )  { 
+		s  =  p.front (  )  ; 
+		p.pop (  )  ; 
+		for  ( int i  =  1 ;  i  <  v[s].size (  )  ;   +  + i )  { 
+			b  =  v[s][i] ; 
+			if  ( v[b][0] > v[s][0]  +  1 )  { 
+				v[b][0]  =  v[s][0]  +  1 ; 
+				p.push ( b )  ; 
+			 } 
+		 } 
+	 } 
+	if  ( v[f][0] =  = 10e8 )   { cout  <  <  0 ;  } 
+	else  { cout  <  <  v[f][0] ;  } 
  } 

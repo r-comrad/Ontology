@@ -8,7 +8,7 @@ public class CommandManager
 {
     enum Type
     {
-        NUN, FUNCTION, VARIABLE, CONDITION, CYCLE, END_LINE, BRACKET;
+        NUN, FUNCTION, VARIABLE, CONDITION, CYCLE, END_LINE, BRACKET, INSIDE;
     }
 
     private Type mType;
@@ -33,6 +33,11 @@ public class CommandManager
         mTypeConditions.add(aType);
     }
 
+    public void setInsideFunction()
+    {
+        mTypeConditions.add(Type.INSIDE);
+    }
+
     public Type getType()
     {
         if (mTypeConditions.contains(Type.CYCLE)) return Type.CYCLE;
@@ -41,7 +46,8 @@ public class CommandManager
 
         else if (mTypeConditions.contains(Type.FUNCTION) &&
                 mTypeConditions.contains(Type.VARIABLE) &&
-                mTypeConditions.contains(Type.BRACKET))
+                mTypeConditions.contains(Type.BRACKET) &&
+                !mTypeConditions.contains(Type.INSIDE))
             return Type.FUNCTION;
 
         else if (mTypeConditions.contains(Type.VARIABLE)) return Type.VARIABLE;
