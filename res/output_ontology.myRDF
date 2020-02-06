@@ -39,14 +39,13 @@ o basic_variable ISA
 value2 o assignment
 o main include
 
-while_2 ( has_part
 while_2 cycle_while ISA
 while_2 main include
 
 value3 l assignment
 value3 min has_part
 value3 m has_part
-value3 a[i] has_part
+value3 a has_part
 value3 while_2 include
 
 value4 i assignment
@@ -56,15 +55,16 @@ value4 while_2 include
 
 if_1_0 o has_part
 if_1_0 k has_part
-if_1_0 m has_part
 condition_1 if_1_0 has_part
 condition_1 while_2 include
+
+
 
 condition_1 if ISA
 if_2_1 i has_part
 if_2_1 n has_part
 condition_2 if_2_1 has_part
-condition_2 while_2 include
+condition_2 condition_1 include
 
 
 

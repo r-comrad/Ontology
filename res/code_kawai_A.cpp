@@ -12,7 +12,7 @@ int main()
 		i += l;
 		o++;
 		if (o%k == 0)
-			m--;
+		{	m--;}
 		if (i >= n)
 		{
 			cout << "-2";

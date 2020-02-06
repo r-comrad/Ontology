@@ -134,15 +134,23 @@ public class DecoderVariable extends Decoder {
     }
 
     private List<String> basicVariableAssignmentDecoder(List<String> aList) {
+        //TODO: function use
         List<String> result = new ArrayList<>();
         String valueName = "value" + mAssignmentCounter++;
         result.add(valueName);
         mRDFWriter.write(valueName, aList.get(0), "assignment");
         for (int i = 1; i < aList.size(); ++i) {
-            if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
-                    aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
-                mRDFWriter.write(valueName, aList.get(i), "has_part");
-            //TODO: use -> has_part
+            String s = aList.get(i);
+            if (s.codePointAt(0) >= 'A' && s.codePointAt(0) <= 'Z' ||
+                    s.codePointAt(0) >= 'a' && s.codePointAt(0) <= 'z')
+            {
+                if (s.contains("["))
+                {
+                    //TODO: upgrade
+                    s = s.substring(0, s.length() - 3);
+                }
+                mRDFWriter.write(valueName, s, "has_part");
+            }
         }
         return result;
     }

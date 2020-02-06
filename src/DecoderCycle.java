@@ -43,7 +43,9 @@ public class DecoderCycle extends Decoder {
             mUsedCycles.add("for");
         }else {
             String cycleName = "while" + "_" + ++mCycleCounter;
-            mRDFWriter.write(cycleName, aList.get(1), "has_part");
+            //TODO: while without breakets {}
+            //TODO: conditions in cycle{}
+            //mRDFWriter.write(cycleName, aList.get(1), "has_part");
             mRDFWriter.write(cycleName, "cycle_while", "ISA");
 
             result.add(cycleName);
