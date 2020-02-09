@@ -1,0 +1,130 @@
+main int return
+main user_function ISA
+
+
+c char has_type
+c basic_variable ISA
+c main include
+
+if_1_0 s.size has_part
+condition_1 if_1_0 has_part
+condition_1 main include
+
+
+
+condition_1 if ISA
+if_2_1 c has_part
+condition_2 if_2_1 has_part
+condition_2 condition_1 include
+
+s1 char has_type
+s1 basic_variable ISA
+value0 s1 assignment
+value0 s has_part
+s1 if_2_1 include
+
+value1 s[0] assignment
+value1 if_2_1 include
+
+value2 s[1] assignment
+value2 s1 has_part
+value2 if_2_1 include
+
+i int has_type
+i basic_variable ISA
+value3 i assignment
+for_1 i has_part
+for_1 cycle_for ISA
+for_1 if_2_1 include
+
+if_3_0 s[i] has_part
+condition_3 if_3_0 has_part
+condition_3 for_1 include
+
+value4 s[i] assignment
+value4 if_3_0 include
+
+
+
+condition_3 if ISA
+if_4_1 s[s.size has_part
+condition_4 if_4_1 has_part
+condition_4 for_1 include
+
+
+
+
+
+condition_4 if ISA
+condition_2 else_block_4_2 has_part
+else_block_4_2 for_1 include
+
+if_5_2 s[0] has_part
+if_5_2 s[2] has_part
+if_5_2 s[1] has_part
+if_5_2 s[1] has_part
+condition_5 if_5_2 has_part
+condition_5 else_block_4_2 include
+
+s1 char has_type
+s1 basic_variable ISA
+value5 s1 assignment
+value5 s has_part
+s1 if_5_2 include
+
+value6 s[0] assignment
+value6 s1 has_part
+value6 if_5_2 include
+
+value7 s[1] assignment
+value7 if_5_2 include
+
+i int has_type
+i basic_variable ISA
+value8 i assignment
+for_2 i has_part
+for_2 cycle_for ISA
+for_2 if_5_2 include
+
+if_6_0 s[i] has_part
+condition_6 if_6_0 has_part
+condition_6 for_2 include
+
+value9 s[i] assignment
+value9 if_6_0 include
+
+
+
+condition_6 if ISA
+if_7_1 s[s.size has_part
+if_7_1 s.size has_part
+condition_7 if_7_1 has_part
+condition_7 for_2 include
+
+
+
+
+
+condition_7 if ISA
+condition_5 else_block_7_3 has_part
+else_block_7_3 for_2 include
+
+
+
+
+
+cycle start implement
+cycle_for cycle AKO
+type start implement
+basic_type type AKO
+variable start implement
+variable type has_type
+basic_variable variable AKO
+char basic_type ISA
+int basic_type ISA
+conditions_types start implement
+if conditions_types AKO
+function start implement
+function type has_part
+function type return
+user_function function AKO

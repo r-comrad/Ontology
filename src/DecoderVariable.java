@@ -177,8 +177,18 @@ public class DecoderVariable extends Decoder {
             {
                 if (isFunctionCallOpenerSequence(s))
                 {
-                    mRDFWriter.write(aList.get(i - 1), aList.get(i + 1), "has_part");
-                    aList.remove(aList.get(i + 1));
+                    int j = i;
+                    while (j < aList.size() &&
+                            (!Objects.equals(aList.get(j), ")")))
+                    {
+                        ++j;
+                    }
+                    List <String> temp = new LinkedList<>(aList.subList(i + 1, j));
+                    for(String ss : temp)
+                    {
+                        mRDFWriter.write(aList.get(i - 1), ss, "has_part");
+                        aList.remove(ss);
+                    }
                 }
             }
         }

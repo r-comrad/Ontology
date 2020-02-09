@@ -1,3 +1,5 @@
+
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class CodeParser
@@ -7,20 +9,19 @@ public class CodeParser
 
     public CodeParser()
     {
-        //mReader = new MyFileReader("code_kawai_A.cpp");
-        mReader = new MyFileReader("code_bfs1.cpp");
-        //mReader = new MyFileReader("code_cycle.cpp");
-        //mReader = new MyFileReader("code_simple.cpp");
+        ArrayList<String> fileNames = new ArrayList();
+        fileNames.add("code_simple.cpp");	//0
+        fileNames.add("code_cycle.cpp");	//1
+        fileNames.add("code_kawai_A.cpp");	//2
+        fileNames.add("code_bfs1.cpp");		//3
+
+        mReader = new MyFileReader(fileNames.get(2));
         mWriter = new MyFileWriter("parsed_code.cpp");
     }
 
     public void process()
     {
-        //boolean needToBeDelete = false;
-        //char c;
-        //while (!Objects.equals(c = mReader.charRead(), '$'))
         String s;
-        //while (!Objects.equals(s = mReader.readLine(), null))
         while ((s = mReader.readLine()) != null)
         {
             if (!(s.contains("using") || s.contains("freopen") || s.contains("include") ||
@@ -30,15 +31,7 @@ public class CodeParser
                 {
                     char c = s.toCharArray()[i];
 
-                    /*if (Objects.equals(c, '#')) needToBeDelete = true;
-                    else if (needToBeDelete)
-                    {
-                        if ((Objects.equals(c, '>') || Objects.equals(c, ';')))
-                        {
-                            needToBeDelete = false;
-                        }
-                    }
-                    else */if (Objects.equals(c, '{')) mWriter.write(" { ");
+                    if (Objects.equals(c, '{')) mWriter.write(" { ");
                     else if (Objects.equals(c, '}')) mWriter.write(" } ");
 
                     else if (Objects.equals(c, '(')) mWriter.write(" ( ");

@@ -60,14 +60,14 @@ public class DecoderCycle extends Decoder {
 
     @Override
     public boolean checkSequence(String aStr) {
-        return isForSequence(aStr) || isWhileTypeSequence(aStr);
+        return isForSequence(aStr) || isWhileSequence(aStr);
     }
 
     private boolean isForSequence(String aStr) {
         return Objects.equals(aStr, "for");
     }
 
-    private boolean isWhileTypeSequence(String aStr) {
+    private boolean isWhileSequence(String aStr) {
         return Objects.equals(aStr, "while");
     }
 

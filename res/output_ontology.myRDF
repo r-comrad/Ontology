@@ -3,133 +3,68 @@ main user_function ISA
 
 n int has_type
 n basic_variable ISA
-s int has_type
-s basic_variable ISA
-f int has_type
-f basic_variable ISA
+m int has_type
+m basic_variable ISA
+k int has_type
+k basic_variable ISA
+l int has_type
+l basic_variable ISA
 n main include
-s main include
-f main include
+m main include
+k main include
+l main include
 
-
-
-int vector has_type
-int vector stores
-int container ISA
-v vector has_type
-v vector stores
-v container ISA
-v n has_part
-vector vector has_type
-vector vector stores
-vector container ISA
-int vector has_type
-int vector stores
-int container ISA
-int main include
-v main include
-vector main include
-int main include
-
-( int has_type
-( basic_variable ISA
-10e8 int has_type
-10e8 basic_variable ISA
-) int has_type
-) basic_variable ISA
-( int include
-10e8 int include
-) int include
-
-
-value0 v[s][0] assignment
-value0 vector include
+a vector has_type
+a int stores
+a container ISA
+a n has_part
+a main include
 
 i int has_type
 i basic_variable ISA
-value1 i assignment
+value0 i assignment
 for_1 i has_part
 for_1 cycle_for ISA
-for_1 vector include
+for_1 main include
 
-j int has_type
-j basic_variable ISA
-value2 j assignment
-for_2 j has_part
-for_2 cycle_for ISA
-for_2 for_1 include
+value1 l assignment
+value1 min has_part
+value1 m has_part
+value1 a has_part
+value1 for_1 include
 
-mtx int has_type
-mtx basic_variable ISA
-mtx for_2 include
+value2 i assignment
+value2 l has_part
+value2 for_1 include
 
-if_1_0 mtx has_part
-if_1_0 v[i].push_back has_part
-if_1_0 j has_part
+
+if_1_0 o has_part
+if_1_0 k has_part
 condition_1 if_1_0 has_part
-condition_1 for_2 include
+condition_1 for_1 include
 
 
-
-p queue has_type
-p int stores
-p container ISA
-p vector include
-
-b int has_type
-b basic_variable ISA
-b vector include
-
-
-while_3 cycle_while ISA
-while_3 vector include
-
-value3 s assignment
-value3 p.front has_part
-value3 while_3 include
-
-
-i int has_type
-i basic_variable ISA
-value4 i assignment
-for_4 i has_part
-for_4 cycle_for ISA
-for_4 while_3 include
-
-value5 b assignment
-value5 v[s] has_part
-value5 for_4 include
 
 condition_1 if ISA
-if_2_1 v[b][0] has_part
-if_2_1 v[s][0] has_part
+if_2_1 i has_part
+if_2_1 n has_part
 condition_2 if_2_1 has_part
-condition_2 for_4 include
-
-value6 v[b][0] assignment
-value6 v[s] has_part
-value6 if_2_1 include
-
-
+condition_2 condition_1 include
 
 
 
 condition_2 if ISA
-if_3_2 v[f][0] has_part
+if_3_2 l has_part
 condition_3 if_3_2 has_part
-condition_3 while_3 include
+condition_3 condition_2 include
 
 
-
-condition_3 else_block_3_3 has_part
-else_block_3_3 condition_3 include
 
 
 
 
 cycle start implement
 cycle_for cycle AKO
-cycle_while cycle AKO
 type start implement
 basic_type type AKO
 variable start implement
@@ -137,7 +72,6 @@ variable type has_type
 container_type type AKO
 container variable AKO
 vector container_type ISA
-queue container_type ISA
 basic_variable variable AKO
 int basic_type ISA
 conditions_types start implement
