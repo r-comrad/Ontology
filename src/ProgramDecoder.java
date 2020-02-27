@@ -68,6 +68,12 @@ public class ProgramDecoder
                     }
                 }
 
+                //TODO: this is kostil
+                if (mCodeLevel.size() > 0 && mCodeLevel.get(mCodeLevel.size() - 1).mX.contains("condition"))
+                {
+                    mCodeLevel.remove(mCodeLevel.size() - 1);
+                }
+
                 if (isLevelDecreaser(str))
                 {
                     --mLevel;

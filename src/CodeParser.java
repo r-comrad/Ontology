@@ -10,12 +10,14 @@ public class CodeParser
     public CodeParser()
     {
         ArrayList<String> fileNames = new ArrayList();
-        fileNames.add("code_simple.cpp");	//0
-        fileNames.add("code_cycle.cpp");	//1
-        fileNames.add("code_kawai_A.cpp");	//2
-        fileNames.add("code_bfs1.cpp");		//3
+        fileNames.add("code_simple.cpp");	            //0
+        fileNames.add("code_cycle.cpp");	            //1
+        fileNames.add("code_kawai_A.cpp");	            //2
+        fileNames.add("code_bfs1.cpp");		            //3
+        fileNames.add("code_furry_sudiaPasha.cpp");		//4
 
-        mReader = new MyFileReader(fileNames.get(2));
+
+        mReader = new MyFileReader(fileNames.get(3));
         mWriter = new MyFileWriter("parsed_code.cpp");
     }
 

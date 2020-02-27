@@ -11,6 +11,10 @@ public class DecoderVariable extends Decoder {
     private HashSet<String> mBasicTypesList;
     private HashSet<String> mContainersList;
 
+    //TODO: singl function call in function
+    private int mMethodCall;
+    private HashSet<String> mMethodsName;
+
     //------------------------------------------------------------------------------------------------------------------
 
     public DecoderVariable(RDFWriter aRDFWriter) {
@@ -25,6 +29,12 @@ public class DecoderVariable extends Decoder {
         mBasicTypesList = typesFile.readAllWords();
         typesFile = new MyFileReader("words/containers.txt");
         mContainersList = typesFile.readAllWords();
+
+        mMethodCall = 0;
+        mMethodsName= new HashSet<>();
+        mMethodsName.add("push");
+        mMethodsName.add("empty");
+        mMethodsName.add("front");
     }
 
     @Override
@@ -141,6 +151,21 @@ public class DecoderVariable extends Decoder {
         mRDFWriter.write(valueName, aList.get(0), "assignment");
         for (int i = 1; i < aList.size(); ++i) {
             String s = aList.get(i);
+            for(String ss : mMethodsName)
+            {
+                if (s.contains(ss))
+                {
+                    String methodCallName = "method_call_" + mMethodCall++;
+                    mRDFWriter.write(valueName, methodCallName, "has_part");
+
+                    String variableName = s.substring(0, s.indexOf('.'));
+                    mRDFWriter.write(methodCallName, variableName, "has_part");
+
+                    String methodName = s.substring(s.indexOf('.') + 1);
+                    mRDFWriter.write(methodCallName, methodName, "has_part");
+                    s = " ";
+                }
+            }
             if (s.codePointAt(0) >= 'A' && s.codePointAt(0) <= 'Z' ||
                     s.codePointAt(0) >= 'a' && s.codePointAt(0) <= 'z')
             {
@@ -163,6 +188,10 @@ public class DecoderVariable extends Decoder {
         List<String> result = new ArrayList<>();
         mUsedContainers.add(aList.get(0));
         //for (String s : aList) {
+        if (Objects.equals(aList.get(0),  aList.get(1)))
+        {
+            aList.remove(2);
+        }
         for (int i = 2; i < aList.size(); ++i)
         {
             String s = aList.get(i);
@@ -178,17 +207,29 @@ public class DecoderVariable extends Decoder {
                 if (isFunctionCallOpenerSequence(s))
                 {
                     int j = i;
-                    while (j < aList.size() &&
-                            (!Objects.equals(aList.get(j), ")")))
+                    int openerCount = 0;
+                    List <String> temp = new LinkedList();//(aList.subList(i + 1, j));
+                    do
                     {
+                        if (Objects.equals(aList.get(j), ")")) --openerCount;
+                        else if (Objects.equals(aList.get(j), "(")) ++openerCount;
+                        else temp.add(aList.get(j));
                         ++j;
                     }
-                    List <String> temp = new LinkedList<>(aList.subList(i + 1, j));
+                    while (j < aList.size() && openerCount > 0);
+
                     for(String ss : temp)
                     {
-                        mRDFWriter.write(aList.get(i - 1), ss, "has_part");
-                        aList.remove(ss);
+                        //TODO: this is kostil
+                        if (!(Objects.equals(ss, "vector")) &&
+                                !(Objects.equals(ss, "int")) &&
+                                !( '0' <= ss.codePointAt(0)  && '9' >= ss.codePointAt(0)))
+                        {
+                            mRDFWriter.write(aList.get(i - 1), ss, "has_part");
+                        }
+                        //aList.remove(ss);
                     }
+                    i = j;
                 }
             }
         }
