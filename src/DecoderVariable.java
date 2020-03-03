@@ -16,6 +16,7 @@ public class DecoderVariable extends Decoder {
     private HashSet<String> mMethodsName;
 
     private HashMap<String, Integer> mTypeNamesCounter;
+    private HashMap<List<String>, String> mStoredSubtypes;
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -39,17 +40,19 @@ public class DecoderVariable extends Decoder {
         mMethodsName.add("front");
 
         mTypeNamesCounter =  new HashMap<>();
+        mStoredSubtypes =  new HashMap<>();
     }
 
     @Override
     public List<String> process(List<String> aList, int aLevel) {
         List<String> result = new ArrayList<>();
         //TODO: const types
-        if (isBasicTypeSequence(aList.get(0))) result = basicVariableDeclarationDecoder(aList);
+        /*if (isBasicTypeSequence(aList.get(0))) result = basicVariableDeclarationDecoder(aList);
         else if (isContainerSequence(aList.get(0))) result = containerDeclarationDecoder(aList);
         else if (aList.size() > 1 && isBasicAssignmentSequence(aList.get(1)))
-            result = basicVariableAssignmentDecoder(aList);
-        return result;
+            result = basicVariableAssignmentDecoder(aList);*/
+        //return result;
+        return dec(aList);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -187,92 +190,98 @@ public class DecoderVariable extends Decoder {
     //------------------------------------------------------------------------------------------------------------------
 
 
-    private void dec(List<String> aList)
+    private List<String> dec(List<String> aList)
     {
-        int number = 1;
-        number = Math.max(number, Math.max(Math.max(aList.lastIndexOf('>'),
-                aList.lastIndexOf('*')),
-                aList.lastIndexOf('&')));
+        List<String> result = new ArrayList<>();
+        int number = Math.max(1, Math.max(Math.max(aList.lastIndexOf(">"),
+                aList.lastIndexOf("*")),
+                aList.lastIndexOf("&")));
+        //TODO: remove & *
 
-        List<String> type = aList.subList(0, number);
+        List<String> type = aList.subList(0, number + 1);
         List<String> variables = aList.subList(number + 1, aList.size());
 
         String s = decRec(type);
         declr(s, variables);
+        return result;
     }
 
-    private String declr(String aType, List<String> aList)
-    {
+    private List<String> declr(String aType, List<String> aList) {
         List<String> result = new ArrayList<>();
-        while(aList.size() > 0)
-        {
-            List<String> currentVariable = aList.subList(0, aList.indexOf(','));
-            aList  = aList.subList(aList.indexOf(',') + 1, aList.size());
+        String variableType = "___VAR_TYP";
+        if (isBasicTypeSequence(aType)) variableType = "basic_variable";
+        else if (true)  variableType = "container_variable";
 
-            mRDFWriter.write(s, aList.get(0), "has_type");
-            mRDFWriter.write(s, "basic_variable", "ISA");
+        while (aList.size() > 0) {
+            //List<String> currentVariable = aList.subList(0, aList.indexOf(','));
+            String currentVariable = aList.get(0);
+            //aList = aList.subList(aList.indexOf(',') + 1, aList.size());
+            aList = aList.subList(1, aList.size());
+
+            //TODO: constructor (,,,),
+            mRDFWriter.write(currentVariable, aType, "has_type");
+            mRDFWriter.write(currentVariable, variableType, "ISA");
+            result.add(currentVariable);
+
+
         }
 
-
-
-        for (int i = 1; i < aList.size(); ++i) {
+        /*for (int i = 1; i < aList.size(); ++i) {
             String s = aList.get(i);
 
-            if (isBasicAssignmentSequence(s))
-            {
+            if (isBasicAssignmentSequence(s)) {
                 int j = i;
                 while (j < aList.size() &&
-                        (!Objects.equals(aList.get(j), ",") || !Objects.equals(aList.get(j), ";")))
-                {
+                        (!Objects.equals(aList.get(j), ",") || !Objects.equals(aList.get(j), ";"))) {
                     ++j;
                 }
-                List <String> temp = aList.subList(i - 1, j);
+                List<String> temp = aList.subList(i - 1, j);
                 basicVariableAssignmentDecoder(temp);
                 i = j;
-            }
-            else
-            {
+            } else {
                 mRDFWriter.write(s, aList.get(0), "has_type");
                 mRDFWriter.write(s, "basic_variable", "ISA");
                 result.add(s);
             }
-        }
+        }*/
         return result;
     }
 
-    private String decRec(List<String> aList)
-    {
+    private String decRec(List<String> aList) {
         String result = "___VAR_REC";
-        if (aList.contains('<'))
-        {
-            //TODO has pointer ( * / & )
-            String currentType = aList.get(0);
-            mUsedContainers.add(currentType);
+        if (mStoredSubtypes.containsKey(aList)) {
+            result = mStoredSubtypes.get(aList);
+        } else {
+            if (aList.contains("<")) {
+                //TODO has pointer ( * / & )
+                String currentType = aList.get(0);
+                mUsedContainers.add(currentType);
 
-            String currentContainer = "v_" + currentType + mTypeNamesCounter.get(currentType);
-            mTypeNamesCounter.put(currentType,  mTypeNamesCounter.get(currentType) + 1);
+                if (!mTypeNamesCounter.containsKey(currentType))
+                {
+                    mTypeNamesCounter.put(currentType, 0);
+                }
 
-            List<String> nextIteration = aList.subList(1, aList.size() - 1);
-            String nextResult = decRec(nextIteration);
+                String currentContainer = "t_" + currentType + "_" + mTypeNamesCounter.get(currentType);
+                mTypeNamesCounter.put(currentType, mTypeNamesCounter.get(currentType) + 1);
 
-            mRDFWriter.write(currentContainer, currentType, "has_type");
-            mRDFWriter.write(currentContainer, nextResult, "has_part");
-            mRDFWriter.write(currentContainer, "container", "ISA");
+                List<String> nextIteration = aList.subList(2, aList.size() - 1);
+                String nextResult = decRec(nextIteration);
 
-            result = currentContainer;
+                mRDFWriter.write(currentContainer, currentType + "_type", "ISA");
+                mRDFWriter.write(currentContainer, nextResult, "has_part");
+                //mRDFWriter.write(currentContainer, "container", "ISA");
+
+                result = currentContainer;
+            } else {
+                String currentType = aList.get(0);
+                mUsedBasicTypes.add(currentType);
+                mRDFWriter.write(currentType, "basic_type", "ISA");
+                result = currentType;
+            }
+            mStoredSubtypes.put(aList, result);
         }
-        else
-        {
-            String currentType = aList.get(0);
-            mUsedBasicTypes.add(currentType);
-            String currentVariable = "v_" + currentType + mTypeNamesCounter.get(currentType);
-            mTypeNamesCounter.put(currentType,  mTypeNamesCounter.get(currentType) + 1);
 
-            mRDFWriter.write(currentVariable, currentType, "has_type");
-            mRDFWriter.write(currentVariable, "basic_variable", "ISA");
-
-            result = currentVariable;
-        }
         return result;
     }
 

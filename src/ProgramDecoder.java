@@ -142,6 +142,6 @@ public class ProgramDecoder
     public boolean isUnusedSequence(String s)
     {
         return Objects.equals(s, ",") /*|| Objects.equals(s, "(") || Objects.equals(s, ")") */||
-                /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") || Objects.equals(s, ">") || Objects.equals(s, "<") || Objects.equals(s, "&&") || Objects.equals(s, "||") || Objects.equals(s, "!=") || Objects.equals(s, "==");
+                /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") /*|| Objects.equals(s, ">") || Objects.equals(s, "<")*/ || Objects.equals(s, "&&") || Objects.equals(s, "||") || Objects.equals(s, "!=") || Objects.equals(s, "==");
     }
 }
