@@ -16,7 +16,7 @@ public class DecoderFunction extends Decoder {
 
     @Override
     public List<String> process(List<String> aList, int aLevel) {
-        mDecoderVariable.infunctionDeclarationDecoder(aList);
+        //mDecoderVariable.infunctionDeclarationDecoder(aList);
 
         //aList.remove("(");
         //aList.remove(")");
