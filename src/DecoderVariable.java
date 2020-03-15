@@ -15,7 +15,6 @@ public class DecoderVariable extends Decoder {
     private int mMethodCall;
     private HashSet<String> mMethodsName;
 
-    // private HashMap<String, Integer> mTypeNamesCounter;
     private HashMap<List<String>, String> mStoredSubtypes;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -39,7 +38,6 @@ public class DecoderVariable extends Decoder {
         mMethodsName.add("empty");
         mMethodsName.add("front");
 
-        mTypeNamesCounter =  new HashMap<>();
         mStoredSubtypes =  new HashMap<>();
     }
 
@@ -126,6 +124,15 @@ public class DecoderVariable extends Decoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
+    private int typeCounter(String aType)
+    {
+        int result = 0;
+        for(Map.Entry<List<String>, String> entry : mStoredSubtypes.entrySet()) {
+            if(entry.getValue().contains(aType)); ++result;
+        }
+        return result;
+    }
+
     private String typeDecoder(List<String> aList) {
         String result = "___VAR_REC";
         if (mStoredSubtypes.containsKey(aList)) {
@@ -136,13 +143,8 @@ public class DecoderVariable extends Decoder {
                 String currentType = aList.get(0);
                 mUsedContainers.add(currentType);
 
-                if (!mTypeNamesCounter.containsKey(currentType))
-                {
-                    mTypeNamesCounter.put(currentType, 0);
-                }
-
-                String currentContainer = "t_" + currentType + "_" + mTypeNamesCounter.get(currentType);
-                mTypeNamesCounter.put(currentType, mTypeNamesCounter.get(currentType) + 1);
+                String currentContainer = "t_" + currentType + "_" + typeCounter(currentType);
+                mStoredSubtypes.put(new ArrayList<> (aList), currentContainer);
 
                 List<String> nextIteration = aList.subList(2, aList.size() - 1);
                 String nextResult = typeDecoder(nextIteration);
@@ -157,8 +159,9 @@ public class DecoderVariable extends Decoder {
                 mUsedBasicTypes.add(currentType);
                 mRDFWriter.write(currentType, "basic_type", "ISA");
                 result = currentType;
+                mStoredSubtypes.put(new ArrayList<> (aList), currentType);
             }
-            mStoredSubtypes.put(aList, result);
+
         }
 
         return result;
