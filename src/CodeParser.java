@@ -18,7 +18,7 @@ public class CodeParser
         fileNames.add("code_types.cpp");		        //5
 
 
-        mReader = new MyFileReader(fileNames.get(5));
+        mReader = new MyFileReader(fileNames.get(3));
         mWriter = new MyFileWriter("parsed_code.cpp");
     }
 
@@ -28,7 +28,7 @@ public class CodeParser
         while ((s = mReader.readLine()) != null)
         {
             if (!(s.contains("using") || s.contains("freopen") || s.contains("include") ||
-                    s.contains("cin") || s.contains("return")))
+                    s.contains("cin") || s.contains("return")|| s.contains("//")))
             {
                 for (int i = 0; i < s.length(); ++i)
                 {

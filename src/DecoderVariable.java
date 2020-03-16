@@ -44,7 +44,7 @@ public class DecoderVariable extends Decoder {
     @Override
     public List<String> process(List<String> aList, int aLevel) {
         List<String> result = new ArrayList<>();
-        int number = Math.max(1, Math.max(Math.max(aList.lastIndexOf(">"),
+        int number = Math.max(0, Math.max(Math.max(aList.lastIndexOf(">"),
                 aList.lastIndexOf("*")),
                 aList.lastIndexOf("&")));
         //TODO: remove & *
@@ -53,7 +53,7 @@ public class DecoderVariable extends Decoder {
         List<String> variables = aList.subList(number + 1, aList.size());
 
         String s = typeDecoder(type);
-        declarationDecoder(s, variables);
+        result = declarationDecoder(s, variables);
         return result;
     }
 
@@ -128,7 +128,7 @@ public class DecoderVariable extends Decoder {
     {
         int result = 0;
         for(Map.Entry<List<String>, String> entry : mStoredSubtypes.entrySet()) {
-            if(entry.getValue().contains(aType)); ++result;
+            if(entry.getValue().contains(aType)) ++result;
         }
         return result;
     }
@@ -168,16 +168,22 @@ public class DecoderVariable extends Decoder {
     }
 
     private List<String> declarationDecoder(String aType, List<String> aList) {
+        //aList.add(",");
         List<String> result = new ArrayList<>();
         String variableType = "___VAR_TYP";
         if (isBasicTypeSequence(aType)) variableType = "basic_variable";
-        else if (true)  variableType = "container_variable";
+        else if (true) variableType = "container_variable";
 
         while (aList.size() > 0) {
             //List<String> currentVariable = aList.subList(0, aList.indexOf(','));
             String currentVariable = aList.get(0);
             //aList = aList.subList(aList.indexOf(',') + 1, aList.size());
-            aList = aList.subList(1, aList.size());
+            do {
+                aList.remove(0);
+            }
+            while (aList.size() > 0 && (aList.get(0).contains("=") ||
+                    ('0' <= aList.get(0).codePointAt(0) && aList.get(0).codePointAt(0) <= '9')));
+
 
             //TODO: constructor (,,,),
             mRDFWriter.write(currentVariable, aType, "has_type");
