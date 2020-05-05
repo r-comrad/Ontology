@@ -33,7 +33,7 @@ public class ProgramDecoder
 
         mCodeLevel = new ArrayList<>();
 
-        mLevel= 0;
+        mLevel= 2;
     }
 
     public void process()
@@ -141,7 +141,7 @@ public class ProgramDecoder
 
     public boolean isUnusedSequence(String s)
     {
-        return Objects.equals(s, ",") /*|| Objects.equals(s, "(") || Objects.equals(s, ")") */||
+        return /*Objects.equals(s, ",")*/ /*|| Objects.equals(s, "(") || Objects.equals(s, ")") ||*/
                 /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") /*|| Objects.equals(s, ">") || Objects.equals(s, "<")*/ || Objects.equals(s, "&&") || Objects.equals(s, "||") || Objects.equals(s, "!=") || Objects.equals(s, "==");
     }
 }

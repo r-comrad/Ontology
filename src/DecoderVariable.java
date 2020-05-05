@@ -17,6 +17,9 @@ public class DecoderVariable extends Decoder {
 
     private HashMap<List<String>, String> mStoredSubtypes;
 
+    private Stack<HashMap<String, String>> mVariableNames;
+    HashMap<String, Integer> mVariableNamesCounet;
+
     //------------------------------------------------------------------------------------------------------------------
 
     public DecoderVariable(RDFWriter aRDFWriter) {
@@ -39,10 +42,17 @@ public class DecoderVariable extends Decoder {
         mMethodsName.add("front");
 
         mStoredSubtypes =  new HashMap<>();
+
+        mVariableNames = new Stack<>();
+        mVariableNamesCounet = new HashMap<>();
     }
 
     @Override
     public List<String> process(List<String> aList, int aLevel) {
+        while (aLevel > mVariableNames.size()) mVariableNames.push(new HashMap<>());
+        if (aLevel < mVariableNames.size()) mVariableNames.pop();
+        //if (1 > mVariableNames.size()) mVariableNames.push(new HashMap<>());
+
         List<String> result = new ArrayList<>();
         int number = Math.max(0, Math.max(Math.max(aList.lastIndexOf(">"),
                 aList.lastIndexOf("*")),
@@ -53,7 +63,31 @@ public class DecoderVariable extends Decoder {
         List<String> variables = aList.subList(number + 1, aList.size());
 
         String s = typeDecoder(type);
-        result = declarationDecoder(s, variables);
+
+        List<String> standartVariables = new ArrayList<>();
+        HashMap<String, String> currentNames = mVariableNames.get(mVariableNames.size() - 1);
+        //for(String i : variables)
+        while (variables.size() > 0)
+        {
+            String i = variables.get(0);
+
+            if (!currentNames.containsKey(i)) {
+                if (!mVariableNamesCounet.containsKey(s)) {
+                    mVariableNamesCounet.put(s, 0);
+                }
+                else {
+                    mVariableNamesCounet.put(s, mVariableNamesCounet.get(s) + 1);
+                }
+                currentNames.put(i, s + "_var_" + mVariableNamesCounet.get(s).toString());
+            }
+            standartVariables.add(currentNames.get(i));
+
+            variables = variables.subList(
+                    Math.max(variables.indexOf(",") + 1, 1)
+                    , variables.size());
+        }
+
+        result = declarationDecoder(s, standartVariables);
         return result;
     }
 

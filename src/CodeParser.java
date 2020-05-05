@@ -42,6 +42,7 @@ public class CodeParser
 
                     else if (Objects.equals(c, ';')) mWriter.write(" ; ");
                     else if (Objects.equals(c, ',')) mWriter.write(" , ");
+                    else if (Objects.equals(c, '.')) mWriter.write(" . ");
 
                     else if (Objects.equals(c, '=')) mWriter.write(" = ");
 
