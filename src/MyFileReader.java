@@ -9,7 +9,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class MyFileReader {
+    public static final String BASIC_TYPES_PATH      = "types/basic_types.txt";
+    public static final String CONTAINERS_PATH       = "types/containers.txt";
+    public static final String METHODS_PATH          = "methods/container_methods.txt";
+
     private BufferedReader mFile;
+
+    public MyFileReader() {}
 
     public MyFileReader(String aFilePath, String aFileName) {
         try {
@@ -19,7 +25,6 @@ public class MyFileReader {
             System.out.println(ex.getMessage());
         }
     }
-
 
     public MyFileReader(String aFileName) {
         try {
@@ -75,5 +80,10 @@ public class MyFileReader {
             result.add(read());
         }
         return result;
+    }
+
+    public HashSet<String> readAllWords(String aFileName) {
+        MyFileReader file = new MyFileReader(aFileName);
+        return file.readAllWords();
     }
 }

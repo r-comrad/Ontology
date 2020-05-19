@@ -1,0 +1,8 @@
+7
+push
+push_back
+pop
+pop_back
+front
+size
+empty

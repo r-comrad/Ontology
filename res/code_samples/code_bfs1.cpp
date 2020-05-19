@@ -8,24 +8,25 @@ int main(){
 	freopen("bfs.out", "w", stdout);
 	int n, s, f;
 	cin >> n >> s >> f;
-	s -= 1;
-	f -= 1;
-	vector <vector <int>> v(n, vector <int>{int(10e8)});
-	v[s][0] = 0;
+	// s -= 1;
+	// f -= 1;
+	vector <vector <int>> v;
+	// (n, vector <int> (1, 1e9));
+	// v[s][0] = 0;
 	for (int i = 0; i < n; ++i){
 		for (int j = 0; j < n; ++j){
 			int mtx;
 			cin >> mtx;
 			if (mtx == 1)
-				v[i].push_back(j);
+			// {v[i].push_back(j);}
 		}
 	}
 	queue <int> p;
 	int b;
-	p.push(s);
+	// p.push(s);
 	while (!p.empty()){
-		s = p.front();
-		p.pop();
+		// s = p.front();
+		// p.pop();
 		for (int i = 1; i < v[s].size(); ++i){
 			b = v[s][i];
 			if (v[b][0]>v[s][0] + 1){

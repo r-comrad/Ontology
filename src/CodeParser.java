@@ -16,9 +16,10 @@ public class CodeParser
         fileNames.add("code_bfs1.cpp");		            //3
         fileNames.add("code_furry_sudiaPasha.cpp");		//4
         fileNames.add("code_types.cpp");		        //5
+        fileNames.add("variableCheck.cpp");		        //6
+        fileNames.add("methodCheck.cpp");		        //7
 
-
-        mReader = new MyFileReader(fileNames.get(3));
+        mReader = new MyFileReader("code_samples/" + fileNames.get(7));
         mWriter = new MyFileWriter("parsed_code.cpp");
     }
 

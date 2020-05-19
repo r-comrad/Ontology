@@ -1,15 +1,22 @@
+import javax.swing.*;
 import java.util.*;
 
 public class DecoderVariable extends Decoder {
+    // File for outputing graph
     private RDFWriter mRDFWriter;
 
+    // Counter for assignment in program (int n = 5 | f = { 9, 0})
     private int mAssignmentCounter;
 
-    private HashSet<String> mUsedBasicTypes;
-    private HashSet<String> mUsedContainers;
+    // Arrays for types used in current program
+    private HashSet<String> mUsedBasicTypes;   // basic types like int, double
+    private HashSet<String> mUsedContainers;   // container types like vector, queue
 
-    private HashSet<String> mBasicTypesList;
-    private HashSet<String> mContainersList;
+    // Arrays for types used in C++
+    private HashSet<String> mBasicTypesList;    // basic types like int, double
+    private HashSet<String> mContainersList;    // container types like vector, queue
+
+    private Integer mMethodCount = 0;
 
     //TODO: singl function call in function
     private int mMethodCall;
@@ -17,7 +24,7 @@ public class DecoderVariable extends Decoder {
 
     private HashMap<List<String>, String> mStoredSubtypes;
 
-    private Stack<HashMap<String, String>> mVariableNames;
+    private Stack<HashMap<String, String>> mVariableNamesStack;
     HashMap<String, Integer> mVariableNamesCounet;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -29,73 +36,135 @@ public class DecoderVariable extends Decoder {
         mUsedBasicTypes = new HashSet<>();
         mUsedContainers = new HashSet<>();
 
-        //TODO: standart path ../   ./
-        MyFileReader typesFile = new MyFileReader("words/basic_types.txt");
-        mBasicTypesList = typesFile.readAllWords();
-        typesFile = new MyFileReader("words/containers.txt");
-        mContainersList = typesFile.readAllWords();
+        MyFileReader reader = new MyFileReader();
+        mBasicTypesList = reader.readAllWords(MyFileReader.BASIC_TYPES_PATH);
+        mContainersList = reader.readAllWords(MyFileReader.CONTAINERS_PATH);
+        mMethodsName = reader.readAllWords(MyFileReader.METHODS_PATH);
 
         mMethodCall = 0;
-        mMethodsName= new HashSet<>();
-        mMethodsName.add("push");
-        mMethodsName.add("empty");
-        mMethodsName.add("front");
+        //mMethodsName= new HashSet<>();
+        //mMethodsName.add("push");
+        //mMethodsName.add("empty");
+        //mMethodsName.add("front");
 
         mStoredSubtypes =  new HashMap<>();
 
-        mVariableNames = new Stack<>();
+        mVariableNamesStack = new Stack<>();
         mVariableNamesCounet = new HashMap<>();
+    }
+
+    String findVariableName(String aName) {
+        String result = "";
+
+        for (int i = 1; i < mVariableNamesStack.size(); ++i) {
+            HashMap<String, String> currentNames = mVariableNamesStack.get(mVariableNamesStack.size() - i);
+
+            if (currentNames.containsKey(aName)) {
+                result = currentNames.get(aName);
+            }
+        }
+
+        return result;
+    }
+
+    String addVariableName(String aName, String aType) {
+        String result = "";
+
+        if (!mVariableNamesCounet.containsKey(aType)) {
+            mVariableNamesCounet.put(aType, 0);
+        } else {
+            mVariableNamesCounet.put(aType, mVariableNamesCounet.get(aType) + 1);
+        }
+
+        HashMap<String, String> currentNames = mVariableNamesStack.get(mVariableNamesStack.size() - 1);
+        String newName = aType + "_var_" + mVariableNamesCounet.get(aType).toString();
+        currentNames.put(aName, newName);
+        result = newName;
+
+        return result;
     }
 
     @Override
     public List<String> process(List<String> aList, int aLevel) {
-        while (aLevel > mVariableNames.size()) mVariableNames.push(new HashMap<>());
-        if (aLevel < mVariableNames.size()) mVariableNames.pop();
-        //if (1 > mVariableNames.size()) mVariableNames.push(new HashMap<>());
 
-        List<String> result = new ArrayList<>();
-        int number = Math.max(0, Math.max(Math.max(aList.lastIndexOf(">"),
+        leavelController(aLevel);
+
+        List<String> result;
+        if (aList.contains(".")) result = methodProcess(aList);
+        else result = preDeclarationDecoder(aList);
+        return result;
+    }
+
+    private List<String> preDeclarationDecoder(List<String> aList) {
+        aList.add(","); // for proper slising by char ','
+
+        int typeEndNumber = Math.max(0, Math.max(Math.max(aList.lastIndexOf(">"),
                 aList.lastIndexOf("*")),
                 aList.lastIndexOf("&")));
         //TODO: remove & *
 
-        List<String> type = aList.subList(0, number + 1);
-        List<String> variables = aList.subList(number + 1, aList.size());
+        List<String> type = aList.subList(0, typeEndNumber + 1);
+        String typeName = typeDecoder(type);
 
-        String s = typeDecoder(type);
+        List<String> variables = aList.subList(typeEndNumber + 1, aList.size());
 
-        List<String> standartVariables = new ArrayList<>();
-        HashMap<String, String> currentNames = mVariableNames.get(mVariableNames.size() - 1);
-        //for(String i : variables)
-        while (variables.size() > 0)
-        {
-            String i = variables.get(0);
-
-            if (!currentNames.containsKey(i)) {
-                if (!mVariableNamesCounet.containsKey(s)) {
-                    mVariableNamesCounet.put(s, 0);
-                }
-                else {
-                    mVariableNamesCounet.put(s, mVariableNamesCounet.get(s) + 1);
-                }
-                currentNames.put(i, s + "_var_" + mVariableNamesCounet.get(s).toString());
-            }
-            standartVariables.add(currentNames.get(i));
-
-            variables = variables.subList(
-                    Math.max(variables.indexOf(",") + 1, 1)
-                    , variables.size());
+        List<String> variablesNames = new ArrayList<>();
+        while (variables.size() > 0) {
+            String currentVariableName = variables.get(0);
+            String name = findVariableName(currentVariableName);
+            if (name.equals("")) name = addVariableName(currentVariableName, typeName);
+            variablesNames.add(name);
+            variables = variables.subList(variables.indexOf(",") + 1, variables.size());
         }
 
-        result = declarationDecoder(s, standartVariables);
+        List<String> result = declarationDecoder(typeName, variablesNames);
         return result;
+    }
+
+
+    public List<String> methodProcess(List<String> aList) {
+        String variableName = aList.get(0);
+        String methodName = aList.get(2);
+        List<String> arguments = aList.subList(4, aList.size() - 1);
+        arguments.add(","); // for proper slising by char ','
+
+        variableName = findVariableName(variableName);
+        String nodeName = "method_call_" + mMethodCount.toString() + "_" + methodName;
+        ++mMethodCount;
+        mRDFWriter.write(nodeName, variableName, "call");
+
+        String typeCoreName = variableName.substring(2, variableName.indexOf('_', 2));
+        mRDFWriter.write(nodeName, typeCoreName + "_" + methodName, "ISA");
+
+        while (arguments.size() > 0)
+        {
+            String currentVariableName = arguments.get(0);
+            currentVariableName = findVariableName(currentVariableName);
+            mRDFWriter.write(currentVariableName, nodeName, "has_part");
+        }
+
+        List<String> result = new ArrayList<String>();
+        result.add(nodeName);
+        return result;
+    }
+
+    private void leavelController(int aLevel)
+    {
+        while (aLevel > mVariableNamesStack.size()) mVariableNamesStack.push(new HashMap<>());
+        if (aLevel < mVariableNamesStack.size()) mVariableNamesStack.pop();
+        //if (1 > mVariableNamesStack.size()) mVariableNamesStack.push(new HashMap<>());
+    }
+
+    private HashMap<String, String> getCurrentVariablePack()
+    {
+        return mVariableNamesStack.get(mVariableNamesStack.size() - 1);
     }
 
     //------------------------------------------------------------------------------------------------------------------
 
     @Override
     public boolean checkSequence(String aStr) {
-        return isTypeSequence(aStr) || isBasicAssignmentSequence(aStr);
+        return isTypeSequence(aStr) || isBasicAssignmentSequence(aStr) || isMethodSequnce(aStr);
     }
 
     private boolean isTypeSequence(String aStr) {
@@ -112,6 +181,18 @@ public class DecoderVariable extends Decoder {
 
     private boolean isBasicAssignmentSequence(String aStr) {
         return Objects.equals(aStr, "=");
+    }
+
+    private boolean isMethodSequnce(String aStr) {
+        return isPointSequnce(aStr) || isVariableNameSequnce(aStr);
+    }
+
+    private boolean isPointSequnce(String aStr) {
+        return Objects.equals(aStr, ".");
+    }
+
+    private boolean isVariableNameSequnce(String aStr) {
+        return !findVariableName(aStr).equals("");
     }
 
     @Override
