@@ -89,9 +89,40 @@ public class DecoderVariable extends Decoder {
 
         leavelController(aLevel);
 
-        List<String> result;
+        List<String> result = new ArrayList<>();
         if (aList.contains(".")) result = methodProcess(aList);
+        else if (aList.get(0).equals("___FUN_VAR"))
+        {
+            aList = aList.subList(1, aList.size());
+            String s = aList.get(0);
+            if (isBasicTypeSequence(s) || isContainerSequence(s))
+            {
+                while(aList.size() > 0)
+                {
+                    int num = aList.indexOf(",");
+                    result.addAll(process(aList.subList(0, num), aLevel));
+                    aList = aList.subList(num + 1, aList.size());
+                }
+            }
+            else result = getVariablesNames(aList, "___NUN_TYP");
+        }
         else result = preDeclarationDecoder(aList);
+        return result;
+    }
+
+    private List<String> getVariablesNames(List<String> aVariables, String aTypeName) {
+        if (!aVariables.get(aVariables.size() - 1).equals(","))
+            aVariables.add(","); // for proper slising by char ','
+
+        List<String> result = new ArrayList<>();
+        while (aVariables.size() > 0) {
+            String currentVariableName = aVariables.get(0);
+            String name = findVariableName(currentVariableName);
+            if (name.equals("")) name = addVariableName(currentVariableName, aTypeName);
+            result.add(name);
+            aVariables = aVariables.subList(aVariables.indexOf(",") + 1, aVariables.size());
+        }
+
         return result;
     }
 
@@ -107,15 +138,7 @@ public class DecoderVariable extends Decoder {
         String typeName = typeDecoder(type);
 
         List<String> variables = aList.subList(typeEndNumber + 1, aList.size());
-
-        List<String> variablesNames = new ArrayList<>();
-        while (variables.size() > 0) {
-            String currentVariableName = variables.get(0);
-            String name = findVariableName(currentVariableName);
-            if (name.equals("")) name = addVariableName(currentVariableName, typeName);
-            variablesNames.add(name);
-            variables = variables.subList(variables.indexOf(",") + 1, variables.size());
-        }
+        List<String> variablesNames = getVariablesNames(variables, typeName);
 
         List<String> result = declarationDecoder(typeName, variablesNames);
         return result;
@@ -133,7 +156,7 @@ public class DecoderVariable extends Decoder {
         ++mMethodCount;
         mRDFWriter.write(nodeName, variableName, "call");
 
-        String typeCoreName = variableName.substring(2, variableName.indexOf('_', 2));
+        String typeCoreName = variableName.substring(0, variableName.indexOf('_', 2));
         mRDFWriter.write(nodeName, typeCoreName + "_" + methodName, "ISA");
 
         while (arguments.size() > 0)
@@ -141,6 +164,7 @@ public class DecoderVariable extends Decoder {
             String currentVariableName = arguments.get(0);
             currentVariableName = findVariableName(currentVariableName);
             mRDFWriter.write(currentVariableName, nodeName, "has_part");
+            arguments = arguments.subList(arguments.indexOf(",") + 1, arguments.size());
         }
 
         List<String> result = new ArrayList<String>();

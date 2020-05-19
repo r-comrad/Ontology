@@ -2,9 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DecoderBracket extends Decoder
+public class DecoderBracketBegin extends Decoder
 {
-    public DecoderBracket()
+    public DecoderBracketBegin()
     {
     }
 
@@ -20,13 +20,13 @@ public class DecoderBracket extends Decoder
     @Override
     public boolean checkSequence(String aStr)
     {
-        return Objects.equals(aStr, "{") || Objects.equals(aStr, "}");
+        return Objects.equals(aStr, "{");
     }
 
     @Override
     public CommandManager.Type getType()
     {
-        return CommandManager.Type.BRACKET;
+        return CommandManager.Type.BEGIN;
     }
 
     //------------------------------------------------------------------------------------------------------------------

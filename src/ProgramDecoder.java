@@ -27,7 +27,7 @@ public class ProgramDecoder
         mDecoders.put(CommandManager.Type.FUNCTION, new DecoderFunction(mRDFWriter, temp));
         mDecoders.put(CommandManager.Type.CONDITION, new DecoderCondition(mRDFWriter));
         mDecoders.put(CommandManager.Type.CYCLE, new DecoderCycle(mRDFWriter, temp));
-        mDecoders.put(CommandManager.Type.BRACKET, new DecoderBracket());
+        mDecoders.put(CommandManager.Type.BRACKET, new DecoderBracketBegin());
         mDecoders.put(CommandManager.Type.END_LINE, new DecoderEndLine());
         mDecoders.put(CommandManager.Type.NUN, new DecoderNun());
 
@@ -141,7 +141,6 @@ public class ProgramDecoder
 
     public boolean isUnusedSequence(String s)
     {
-        return /*Objects.equals(s, ",")*/ /*|| Objects.equals(s, "(") || Objects.equals(s, ")") ||*/
-                /*Objects.equals(s, "=") ||*/ Objects.equals(s, "+") /*|| Objects.equals(s, ">") || Objects.equals(s, "<")*/ || Objects.equals(s, "&&") || Objects.equals(s, "||") || Objects.equals(s, "!=") || Objects.equals(s, "==");
+        return Objects.equals(s, "+")  || Objects.equals(s, "&&") || Objects.equals(s, "||") || Objects.equals(s, "!=") || Objects.equals(s, "==");
     }
 }
