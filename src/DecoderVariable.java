@@ -29,8 +29,8 @@ public class DecoderVariable extends Decoder {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public DecoderVariable(RDFWriter aRDFWriter) {
-        mRDFWriter = aRDFWriter;
+    public DecoderVariable(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
         mAssignmentCounter = 0;
 
         mUsedBasicTypes = new HashSet<>();
@@ -154,16 +154,16 @@ public class DecoderVariable extends Decoder {
         variableName = findVariableName(variableName);
         String nodeName = "method_call_" + mMethodCount.toString() + "_" + methodName;
         ++mMethodCount;
-        mRDFWriter.write(nodeName, variableName, "call");
+        super.mRDFWriter.write(nodeName, variableName, "call");
 
         String typeCoreName = variableName.substring(0, variableName.indexOf('_', 2));
-        mRDFWriter.write(nodeName, typeCoreName + "_" + methodName, "ISA");
+        super.mRDFWriter.write(nodeName, typeCoreName + "_" + methodName, "ISA");
 
         while (arguments.size() > 0)
         {
             String currentVariableName = arguments.get(0);
             currentVariableName = findVariableName(currentVariableName);
-            mRDFWriter.write(currentVariableName, nodeName, "has_part");
+            super.mRDFWriter.write(currentVariableName, nodeName, "has_part");
             arguments = arguments.subList(arguments.indexOf(",") + 1, arguments.size());
         }
 
@@ -234,30 +234,30 @@ public class DecoderVariable extends Decoder {
     }
 
     private void variablePack() {
-        mRDFWriter.write("type", "start", "implement");
-        mRDFWriter.write("basic_type", "type", "AKO");
+        super.mRDFWriter.write("type", "start", "implement");
+        super.mRDFWriter.write("basic_type", "type", "AKO");
 
         //TODO: no variables
-        mRDFWriter.write("variable", "start", "implement");
-        mRDFWriter.write("variable", "type", "has_type");
+        super.mRDFWriter.write("variable", "start", "implement");
+        super.mRDFWriter.write("variable", "type", "has_type");
     }
 
     private void containerPack() {
         if (mUsedContainers.size() == 0) return;
 
-        mRDFWriter.write("container_type", "type", "AKO");
-        mRDFWriter.write("container", "variable", "AKO");
+        super.mRDFWriter.write("container_type", "type", "AKO");
+        super.mRDFWriter.write("container", "variable", "AKO");
 
         Iterator<String> i = mUsedContainers.iterator();
         while (i.hasNext()) {
-            mRDFWriter.write(i.next(), "container_type", "ISA");
+            super.mRDFWriter.write(i.next(), "container_type", "ISA");
         }
     }
 
     private void basicVariablePack() {
-        mRDFWriter.write("basic_variable", "variable", "AKO");
+        super.mRDFWriter.write("basic_variable", "variable", "AKO");
         for (String i : mUsedBasicTypes) {
-            mRDFWriter.write(i, "basic_type", "ISA");
+            super.mRDFWriter.write(i, "basic_type", "ISA");
         }
     }
 
@@ -288,15 +288,15 @@ public class DecoderVariable extends Decoder {
                 List<String> nextIteration = aList.subList(2, aList.size() - 1);
                 String nextResult = typeDecoder(nextIteration);
 
-                mRDFWriter.write(currentContainer, currentType + "_type", "ISA");
-                mRDFWriter.write(currentContainer, nextResult, "has_part");
+                super.mRDFWriter.write(currentContainer, currentType + "_type", "ISA");
+                super.mRDFWriter.write(currentContainer, nextResult, "has_part");
                 //mRDFWriter.write(currentContainer, "container", "ISA");
 
                 result = currentContainer;
             } else {
                 String currentType = aList.get(0);
                 mUsedBasicTypes.add(currentType);
-                mRDFWriter.write(currentType, "basic_type", "ISA");
+                super.mRDFWriter.write(currentType, "basic_type", "ISA");
                 result = currentType;
                 mStoredSubtypes.put(new ArrayList<> (aList), currentType);
             }
@@ -325,8 +325,8 @@ public class DecoderVariable extends Decoder {
 
 
             //TODO: constructor (,,,),
-            mRDFWriter.write(currentVariable, aType, "has_type");
-            mRDFWriter.write(currentVariable, variableType, "ISA");
+            super.mRDFWriter.write(currentVariable, aType, "has_type");
+            super.mRDFWriter.write(currentVariable, variableType, "ISA");
             result.add(currentVariable);
 
             /*
@@ -370,7 +370,7 @@ public class DecoderVariable extends Decoder {
         List<String> result = new ArrayList<>();
         String valueName = "value" + mAssignmentCounter++;
         result.add(valueName);
-        mRDFWriter.write(valueName, aList.get(0), "assignment");
+        super.mRDFWriter.write(valueName, aList.get(0), "assignment");
         for (int i = 1; i < aList.size(); ++i) {
             String s = aList.get(i);
             for(String ss : mMethodsName)
@@ -378,13 +378,13 @@ public class DecoderVariable extends Decoder {
                 if (s.contains(ss))
                 {
                     String methodCallName = "method_call_" + mMethodCall++;
-                    mRDFWriter.write(valueName, methodCallName, "has_part");
+                    super.mRDFWriter.write(valueName, methodCallName, "has_part");
 
                     String variableName = s.substring(0, s.indexOf('.'));
-                    mRDFWriter.write(methodCallName, variableName, "has_part");
+                    super.mRDFWriter.write(methodCallName, variableName, "has_part");
 
                     String methodName = s.substring(s.indexOf('.') + 1);
-                    mRDFWriter.write(methodCallName, methodName, "has_part");
+                    super.mRDFWriter.write(methodCallName, methodName, "has_part");
                     s = " ";
                 }
             }
@@ -396,7 +396,7 @@ public class DecoderVariable extends Decoder {
                     //TODO: upgrade
                     s = s.substring(0, s.length() - 3);
                 }
-                mRDFWriter.write(valueName, s, "has_part");
+                super.mRDFWriter.write(valueName, s, "has_part");
             }
         }
         return result;

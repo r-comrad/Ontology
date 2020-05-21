@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class DecoderEndLine extends Decoder
 {
-    public DecoderEndLine()
-    {
+    public DecoderEndLine(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
     }
 
     @Override

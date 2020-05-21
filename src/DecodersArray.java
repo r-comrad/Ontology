@@ -9,7 +9,7 @@ public class DecodersArray {
     List<String> mComandList = new ArrayList();
     ArrayList<Pair<String, String>> mCodeLevel;
 
-    DecodersArray(RDFWriter aRDFWriter)
+    DecodersArray()
     {
         mCommandManager = new CommandManager();
         mCommandManager.reset();
@@ -17,17 +17,22 @@ public class DecodersArray {
         mRDFWriter = new RDFWriter();
 
         mDecoders = new HashMap();
-        mDecoders.put(CommandManager.Type.VARIABLE, DecoderVariable(aRDFWriterm this);
-        mDecoders.put(CommandManager.Type.FUNCTION, new DecoderFunction(aRDFWriter, temp));
-        mDecoders.put(CommandManager.Type.CONDITION, new DecoderCondition(aRDFWriter));
-        mDecoders.put(CommandManager.Type.CYCLE, new DecoderCycle(aRDFWriter, temp));
-        mDecoders.put(CommandManager.Type.BEGIN, new DecoderBracketBegin());
-        mDecoders.put(CommandManager.Type.END, new DecoderBracketEnd());
-        mDecoders.put(CommandManager.Type.END_LINE, new DecoderEndLine());
-        mDecoders.put(CommandManager.Type.NUN, new DecoderNun());
+        mDecoders.put(CommandManager.Type.VARIABLE,  new DecoderVariable(    this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.FUNCTION,  new DecoderFunction(    this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.CONDITION, new DecoderCondition(   this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.CYCLE,     new DecoderCycle(       this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.BEGIN,     new DecoderBracketBegin(this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.END,       new DecoderBracketEnd(  this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.END_LINE,  new DecoderEndLine(     this, mRDFWriter));
+        mDecoders.put(CommandManager.Type.NUN,       new DecoderNun(         this, mRDFWriter));
 
         mCodeLevel = new ArrayList<>();
         mCodeLevel.add(new Pair("start", "include"));
+    }
+
+    public List<String> process(CommandManager.Type aType, List<String> aComands)
+    {
+        return mDecoders.get(aType).process(aComands, mCodeLevel.size());
     }
 
     private void checkDecoderConditions(String str)
@@ -38,7 +43,7 @@ public class DecodersArray {
         }
     }
 
-    private void finishProcessing()
+    public void finishProcessing()
     {
         for (Map.Entry<CommandManager.Type, Decoder> entry : mDecoders.entrySet())
         {

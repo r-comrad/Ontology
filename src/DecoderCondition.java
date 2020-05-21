@@ -3,8 +3,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class DecoderCondition extends Decoder {
-    private RDFWriter mRDFWriter;
-
     private int mConditionCounter;
     List<String> mConditionNames;
     List<Integer> mConditionTypes;
@@ -14,8 +12,8 @@ public class DecoderCondition extends Decoder {
     private int mUsedConditions;
     // TODO: List<String> mConditionCounters;
 
-    public DecoderCondition(RDFWriter aRDFWriter) {
-        mRDFWriter = aRDFWriter;
+    public DecoderCondition(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
 
         mConditionCounter = 0;
         mConditionNames = new ArrayList<>();
@@ -40,8 +38,6 @@ public class DecoderCondition extends Decoder {
             mConditionLevels.add(aLevel);
             result.addAll(conditionOpener());
         }
-
-
 
         result.addAll(conditionDecoder(aList));
         return result;
@@ -77,7 +73,7 @@ public class DecoderCondition extends Decoder {
     @Override
     public void writePack() {
         if (mConditionCounter > 0) {
-            mRDFWriter.write("conditions_types", "start", "implement");
+            super.mRDFWriter.write("conditions_types", "start", "implement");
             conditionPack();
         }
     }
@@ -172,7 +168,7 @@ public class DecoderCondition extends Decoder {
         result.add(blockName);
 
         String conditionName = mConditionNames.get(conditionNumber);
-        mRDFWriter.write(conditionName, blockName, "has_part");
+        super.mRDFWriter.write(conditionName, blockName, "has_part");
         return result;
     }
 }

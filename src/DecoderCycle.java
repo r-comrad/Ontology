@@ -4,15 +4,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class DecoderCycle extends Decoder {
-    private RDFWriter mRDFWriter;
     DecoderVariable mDecoderVariable;
     private int mCycleCounter;
 
     private HashSet<String> mUsedCycles;
 
-    public DecoderCycle(RDFWriter aRDFWriter, DecoderVariable aDecoderVariable) {
-        mRDFWriter = aRDFWriter;
-        mDecoderVariable = aDecoderVariable;
+    public DecoderCycle(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
         mCycleCounter = 0;
 
         mUsedCycles = new HashSet<>();
@@ -33,11 +31,11 @@ public class DecoderCycle extends Decoder {
             temp = mDecoderVariable.process(temp, aLevel + 1);
             for(String s : temp)
             {
-                mRDFWriter.write(cycleName, s, "has_part");
+                super.mRDFWriter.write(cycleName, s, "has_part");
             }
 
             //mRDFWriter.write(cycleName, aList.get(1), "has_part");
-            mRDFWriter.write(cycleName, "cycle_for", "ISA");
+            super.mRDFWriter.write(cycleName, "cycle_for", "ISA");
 
             result.add(cycleName);
 
@@ -47,7 +45,7 @@ public class DecoderCycle extends Decoder {
             //TODO: while without breakets {}
             //TODO: conditions in cycle{}
             //mRDFWriter.write(cycleName, aList.get(1), "has_part");
-            mRDFWriter.write(cycleName, "cycle_while", "ISA");
+            super.mRDFWriter.write(cycleName, "cycle_while", "ISA");
 
             result.add(cycleName);
 
@@ -83,14 +81,14 @@ public class DecoderCycle extends Decoder {
     public void writePack() {
         if (mUsedCycles.size() > 0)
         {
-            mRDFWriter.write("cycle", "start", "implement");
+            super.mRDFWriter.write("cycle", "start", "implement");
 
             if (mUsedCycles.contains("for"))
-                mRDFWriter.write("cycle_for", "cycle", "AKO");
+                super.mRDFWriter.write("cycle_for", "cycle", "AKO");
 
 
             if (mUsedCycles.contains("while"))
-                mRDFWriter.write("cycle_while", "cycle", "AKO");
+                super.mRDFWriter.write("cycle_while", "cycle", "AKO");
         }
     }
 

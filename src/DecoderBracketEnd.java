@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class DecoderBracketEnd extends Decoder
 {
-    public DecoderBracketEnd()
-    {
+    public DecoderBracketEnd(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class DecoderBracketEnd extends Decoder
     @Override
     public boolean checkSequence(String aStr)
     {
-        Objects.equals(aStr, "}");
+        return Objects.equals(aStr, "}");
     }
 
     @Override

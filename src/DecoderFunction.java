@@ -8,18 +8,13 @@ public class DecoderFunction extends Decoder {
 
     //TODO: function call without asignment
 
-    public DecoderFunction(RDFWriter aRDFWriter, DecoderVariable aDecoderVariable) {
-        mRDFWriter = aRDFWriter;
+    public DecoderFunction(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
         mUsedFunctions = new HashSet<>();
-        mDecoderVariable = aDecoderVariable;
     }
 
     @Override
     public List<String> process(List<String> aList, int aLevel) {
-        //mDecoderVariable.infunctionDeclarationDecoder(aList);
-
-        //aList.remove("(");
-        //aList.remove(")");
         clearFunctionCall(aList);
 
         List<String> result = new ArrayList<>();
@@ -53,13 +48,13 @@ public class DecoderFunction extends Decoder {
     }
 
     private void functionPack() {
-        mRDFWriter.write("function", "start", "implement");
-        mRDFWriter.write("function", "type", "has_part");
-        mRDFWriter.write("function", "type", "return");
+        super.mRDFWriter.write("function", "start", "implement");
+        super.mRDFWriter.write("function", "type", "has_part");
+        super.mRDFWriter.write("function", "type", "return");
     }
 
     private void userFunctionPack() {
-        mRDFWriter.write("user_function", "function", "AKO");
+        super.mRDFWriter.write("user_function", "function", "AKO");
     }
 
     private void stdFunctionPack() {
@@ -76,29 +71,29 @@ public class DecoderFunction extends Decoder {
             for (int j = 0; j < groupSize; ++j) {
                 String funkName = fileReader.read();
                 if (mUsedFunctions.contains(funkName)) {
-                    mRDFWriter.write(funkName, parent + "_function", "ISA");
+                    super.mRDFWriter.write(funkName, parent + "_function", "ISA");
                     isWrited = true;
                 }
             }
 
             if (isWrited) {
-                mRDFWriter.write(parent + "_function", "std_function", "ISA");
+                super.mRDFWriter.write(parent + "_function", "std_function", "ISA");
                 isAnyStdFunkWrited = true;
             }
         }
 
         if (isAnyStdFunkWrited) {
-            mRDFWriter.write("std_function", "function", "AKO");
+            super.mRDFWriter.write("std_function", "function", "AKO");
         }
     }
 
     //------------------------------------------------------------------------------------------------------------------
 
     private void functionDecoder(List<String> aList) {
-        mRDFWriter.write(aList.get(1), aList.get(0), "return");
-        mRDFWriter.write(aList.get(1), "user_function", "ISA");
+        super.mRDFWriter.write(aList.get(1), aList.get(0), "return");
+        super.mRDFWriter.write(aList.get(1), "user_function", "ISA");
         for (int i = 2; i < aList.size(); ++i) {
-            mRDFWriter.write(aList.get(1), aList.get(i + 1), "has_part");
+            super.mRDFWriter.write(aList.get(1), aList.get(i + 1), "has_part");
         }
     }
 }

@@ -3,6 +3,14 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class Decoder {
+    protected DecodersArray mDecodersArray;
+    protected RDFWriter mRDFWriter;
+
+    public Decoder(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        mDecodersArray = aDecodersArray;
+        mRDFWriter = aRDFWriter;
+    }
+
     public abstract List<String> process(List<String> aList, int aLevel);
     public abstract boolean checkSequence(String aStr);
     public abstract void writePack();

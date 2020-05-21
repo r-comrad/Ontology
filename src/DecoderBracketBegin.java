@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class DecoderBracketBegin extends Decoder
 {
-    public DecoderBracketBegin()
-    {
+    public DecoderBracketBegin(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
     }
 
     @Override

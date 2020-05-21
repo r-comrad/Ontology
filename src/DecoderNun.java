@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class DecoderNun extends Decoder
 {
-    public DecoderNun()
-    {
+    public DecoderNun(DecodersArray aDecodersArray, RDFWriter aRDFWriter) {
+        super(aDecodersArray, aRDFWriter);
     }
 
     @Override
