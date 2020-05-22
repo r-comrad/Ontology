@@ -18,7 +18,7 @@ int main(){
 			int mtx;
 			cin >> mtx;
 			if (mtx == 1)
-			// {v[i].push_back(j);}
+			 {v[i].push_back(j);}
 		}
 	}
 	queue <int> p;
@@ -35,7 +35,8 @@ int main(){
 			}
 		}
 	}
-	if (v[f][0]==10e8) {cout << 0;}
-	else {cout << v[f][0];}
+	if (v[f][0]==10e8) cout << 0;
+	else 
+		cout << v[f][0];
 	return 0;
 }
