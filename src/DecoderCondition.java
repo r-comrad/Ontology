@@ -19,7 +19,7 @@ public class DecoderCondition extends Decoder {
         mConditionNames = new ArrayList<>();
         mConditionTypes = new ArrayList<>();
         mConditionCounters = new ArrayList<>();
-        mConditionLevels = new ArrayList<>();
+        //mConditionLevels = new ArrayList<>();
 
         mUsedConditions = 0;
     }
@@ -29,17 +29,16 @@ public class DecoderCondition extends Decoder {
         List<String> result = new ArrayList<>();
         new ArrayList<>();
 
-        while(mConditionLevels.size() > 0 &&
-                mConditionLevels.get(mConditionLevels.size() - 1) > aLevel) conditionCloser();
-
-        if (isIfSequence(aList.get(0))) {
-            if(mConditionLevels.size() > 0 &&
-                    mConditionLevels.get(mConditionLevels.size() - 1) == aLevel) conditionCloser();
-            mConditionLevels.add(aLevel);
-            result.addAll(conditionOpener());
+        if (isConditionOpenSequence(aList.get(0)))
+        {
+            result = conditionOpener();
         }
-
-        result.addAll(conditionDecoder(aList));
+        else if (isConditionCloseSequence(aList.get(0))){
+            conditionCloser();
+        }
+        else {
+            result.addAll(conditionDecoder(aList));
+        }
         return result;
     }
 
@@ -48,7 +47,7 @@ public class DecoderCondition extends Decoder {
     @Override
     public boolean checkSequence(String aStr) {
 
-        return isIfSequence(aStr) || isElseSequence(aStr);
+        return isIfSequence(aStr) || isElseSequence(aStr) || isConditionFlagSequence(aStr);
     }
 
     private boolean isIfSequence(String aStr) {
@@ -61,6 +60,18 @@ public class DecoderCondition extends Decoder {
 
     private boolean isElseIfSequence(String aStr1, String aStr2) {
         return Objects.equals(aStr1, "else") && Objects.equals(aStr2, "if");
+    }
+
+    private boolean isConditionFlagSequence(String aStr) {
+        return isConditionOpenSequence(aStr) || isConditionCloseSequence(aStr);
+    }
+
+    private boolean isConditionOpenSequence(String aStr) {
+        return aStr.equals("___IF__BEG");
+    }
+
+    private boolean isConditionCloseSequence(String aStr) {
+        return aStr.equals("___IF__END");
     }
 
     @Override
@@ -129,8 +140,8 @@ public class DecoderCondition extends Decoder {
                 parent = "if-else_tree";
                 mUsedConditions |= 4;
             }
-            mRDFWriter.write(conditionName, parent, "ISA");
-            mConditionLevels.remove(mConditionLevels.size() - 1);
+            super.mRDFWriter.write(conditionName, parent, "ISA");
+            //mConditionLevels.remove(mConditionLevels.size() - 1);
         }
     }
 
@@ -159,12 +170,16 @@ public class DecoderCondition extends Decoder {
         ++subConditionNumber;
         mConditionCounters.set(conditionNumber, subConditionNumber);
 
-        for (int i = 1; i < aList.size(); ++i) {
+        /*for (int i = 1; i < aList.size(); ++i) {
             if (aList.get(i).codePointAt(0) >= 'A' && aList.get(i).codePointAt(0) <= 'Z' ||
                     aList.get(i).codePointAt(0) >= 'a' && aList.get(i).codePointAt(0) <= 'z')
                 mRDFWriter.write(blockName, aList.get(i), "has_part");
+        }*/
+        if (aList.indexOf("(") != -1) {
+            List<String> args = aList.subList(aList.indexOf("("), aList.indexOf(")"));
+            //TODO args
         }
-
+        
         result.add(blockName);
 
         String conditionName = mConditionNames.get(conditionNumber);

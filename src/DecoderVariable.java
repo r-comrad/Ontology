@@ -86,10 +86,11 @@ public class DecoderVariable extends Decoder {
 
     @Override
     public List<String> process(List<String> aList, int aLevel) {
-
-        leavelController(aLevel);
-
         List<String> result = new ArrayList<>();
+        leavelController(aLevel);
+        if (aList.size() == 0) return result;
+
+
         if (aList.contains(".")) result = methodProcess(aList);
         else if (aList.get(0).equals("___FUN_VAR"))
         {
@@ -151,6 +152,8 @@ public class DecoderVariable extends Decoder {
         List<String> arguments = aList.subList(4, aList.size() - 1);
         arguments.add(","); // for proper slising by char ','
 
+        if (variableName.indexOf('[') != -1)
+            variableName = variableName.substring(0, variableName.indexOf('[')); //TODO: kostil for array
         variableName = findVariableName(variableName);
         String nodeName = "method_call_" + mMethodCount.toString() + "_" + methodName;
         ++mMethodCount;
@@ -159,8 +162,7 @@ public class DecoderVariable extends Decoder {
         String typeCoreName = variableName.substring(0, variableName.indexOf('_', 2));
         super.mRDFWriter.write(nodeName, typeCoreName + "_" + methodName, "ISA");
 
-        while (arguments.size() > 0)
-        {
+        while (arguments.size() > 0) {
             String currentVariableName = arguments.get(0);
             currentVariableName = findVariableName(currentVariableName);
             super.mRDFWriter.write(currentVariableName, nodeName, "has_part");
@@ -172,10 +174,10 @@ public class DecoderVariable extends Decoder {
         return result;
     }
 
-    private void leavelController(int aLevel)
+    public void leavelController(int aLevel)
     {
         while (aLevel > mVariableNamesStack.size()) mVariableNamesStack.push(new HashMap<>());
-        if (aLevel < mVariableNamesStack.size()) mVariableNamesStack.pop();
+        while (aLevel < mVariableNamesStack.size()) mVariableNamesStack.pop();
         //if (1 > mVariableNamesStack.size()) mVariableNamesStack.push(new HashMap<>());
     }
 

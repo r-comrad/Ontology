@@ -30,9 +30,9 @@ public class DecodersArray {
         mCodeLevel.add(new Pair("start", "include"));
     }
 
-    public List<String> process(CommandManager.Type aType, List<String> aComands)
+    public List<String> process(CommandManager.Type aType, List<String> aComands, int aLevel)
     {
-        return mDecoders.get(aType).process(aComands, mCodeLevel.size());
+        return mDecoders.get(aType).process(aComands, aLevel);
     }
 
     private void checkDecoderConditions(String str)
@@ -68,6 +68,7 @@ public class DecodersArray {
                 mCodeLevel.remove(mCodeLevel.size() - 1);
             } else if (mCommandManager.isLevelIncreaser()) {
                 mCodeLevel.add(new Pair(connections.get(0), "include"));
+                mDecoders.get(CommandManager.Type.VARIABLE).process(new ArrayList(),mCodeLevel.size());
             }
 
             mComandList.clear();

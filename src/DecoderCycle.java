@@ -28,7 +28,7 @@ public class DecoderCycle extends Decoder {
             List <String> temp = aList.subList(2, aList.indexOf(";"));
             //temp = temp.subList(0, temp.indexOf("="));
             //mDecoderVariable.inCycleDeclarationDecoder(temp);
-            temp = mDecoderVariable.process(temp, aLevel + 1);
+            temp = super.mDecodersArray.process(CommandManager.Type.VARIABLE ,temp, aLevel + 1);
             for(String s : temp)
             {
                 super.mRDFWriter.write(cycleName, s, "has_part");
